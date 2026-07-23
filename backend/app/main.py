@@ -46,6 +46,7 @@ from app.services.chat import ChatService
 from app.services.documents import DocumentIngestionService
 from app.services.ingestion_jobs import IngestionJobRunner
 from app.services.knowledge import KnowledgeSearchService
+from app.services.operations import OperationsReviewService
 from app.services.retention import RetentionService
 from app.services.tickets import TicketService
 from app.storage.files import LocalFileStorage
@@ -63,6 +64,7 @@ def create_app(
     orchestrator: SupportOrchestrator | None = None,
     chat_service: ChatService | None = None,
     retention_service: RetentionService | None = None,
+    operations_service: OperationsReviewService | None = None,
     metrics: MetricsRegistry | None = None,
     run_ingestion_recovery: bool = False,
     run_retention_cleanup: bool = False,
@@ -71,6 +73,7 @@ def create_app(
     configure_logging(resolved_settings.log_level)
     resolved_metrics = metrics or MetricsRegistry()
     database: Database | None = None
+    agent_database: Database | None = None
     if (
         auth_service is None
         or readiness_probe is None
@@ -81,8 +84,14 @@ def create_app(
         or orchestrator is None
         or chat_service is None
         or retention_service is None
+        or operations_service is None
     ):
         database = Database(resolved_settings)
+    if knowledge_service is None or support_tools is None:
+        agent_database = Database(
+            resolved_settings,
+            database_url=resolved_settings.agent_database_url.get_secret_value(),
+        )
     resolved_auth_service = auth_service
     if resolved_auth_service is None:
         if database is None:
@@ -136,11 +145,11 @@ def create_app(
             documents=document_repository,
         )
     if resolved_knowledge_service is None:
-        if database is None or embedding_provider is None:
+        if agent_database is None or embedding_provider is None:
             raise RuntimeError("Retrieval initialization failed")
         resolved_knowledge_service = KnowledgeSearchService(
             retriever=HybridRetriever(
-                repository=SqlAlchemyRetrievalRepository(database.sessions),
+                repository=SqlAlchemyRetrievalRepository(agent_database.sessions),
                 embeddings=embedding_provider,
                 candidate_k=resolved_settings.rag_candidate_k,
                 rank_constant=resolved_settings.rrf_rank_constant,
@@ -154,20 +163,14 @@ def create_app(
         raise RuntimeError("Ingestion runner initialization failed")
     resolved_support_tools = support_tools
     if resolved_support_tools is None:
-        if database is None:
+        if database is None or agent_database is None:
             raise RuntimeError("Tool initialization failed")
         resolved_support_tools = SupportToolSet(
-            products=ProductSearchTool(
-                SqlAlchemyProductRepository(database.sessions)
-            ),
-            orders=OrderStatusTool(SqlAlchemyOrderRepository(database.sessions)),
-            warranties=WarrantyStatusTool(
-                SqlAlchemyWarrantyRepository(database.sessions)
-            ),
+            products=ProductSearchTool(SqlAlchemyProductRepository(agent_database.sessions)),
+            orders=OrderStatusTool(SqlAlchemyOrderRepository(agent_database.sessions)),
+            warranties=WarrantyStatusTool(SqlAlchemyWarrantyRepository(agent_database.sessions)),
             knowledge=KnowledgeBaseTool(resolved_knowledge_service),
-            tickets=TicketCreationTool(
-                TicketService(TicketRepository(database.sessions))
-            ),
+            tickets=TicketCreationTool(TicketService(TicketRepository(database.sessions))),
         )
     resolved_orchestrator = orchestrator
     if resolved_orchestrator is None:
@@ -208,6 +211,14 @@ def create_app(
             ConversationRepository(database.sessions),
             retention_days=resolved_settings.conversation_retention_days,
         )
+    resolved_operations_service = operations_service
+    if resolved_operations_service is None:
+        if database is None:
+            raise RuntimeError("Operations review initialization failed")
+        resolved_operations_service = OperationsReviewService(
+            conversations=ConversationRepository(database.sessions),
+            tickets=TicketRepository(database.sessions),
+        )
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
@@ -239,16 +250,14 @@ def create_app(
                         await task
             if database is not None:
                 await database.dispose()
+            if agent_database is not None:
+                await agent_database.dispose()
 
     app = FastAPI(
         title="Vietnamese Customer Support RAG",
         version="1.0.0",
         docs_url="/docs" if resolved_settings.app_env != "production" else None,
-        openapi_url=(
-            "/openapi.json"
-            if resolved_settings.app_env != "production"
-            else None
-        ),
+        openapi_url=("/openapi.json" if resolved_settings.app_env != "production" else None),
         redoc_url=None,
         lifespan=lifespan,
     )
@@ -262,6 +271,7 @@ def create_app(
     app.state.orchestrator = resolved_orchestrator
     app.state.chat_service = resolved_chat_service
     app.state.retention_service = resolved_retention_service
+    app.state.operations_service = resolved_operations_service
     app.state.metrics = resolved_metrics
     app.state.rate_limiter = SlidingWindowRateLimiter(
         {

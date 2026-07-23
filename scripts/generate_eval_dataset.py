@@ -31,10 +31,7 @@ FILLERS = [
 
 def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
     path.write_text(
-        "".join(
-            json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n"
-            for row in rows
-        ),
+        "".join(json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n" for row in rows),
         encoding="utf-8",
     )
 
@@ -77,9 +74,24 @@ def agent_cases() -> list[dict[str, Any]]:
             "Cửa hàng hỗ trợ phương thức thanh toán nào?",
         ),
         (
+            "faq",
+            ("search_knowledge_base",),
+            "Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư?",
+        ),
+        (
             "order_status",
             ("get_order_status",),
             "Mã DH2026000001 hiện đang ở trạng thái nào?",
+        ),
+        (
+            "order_status",
+            ("get_order_status", "search_knowledge_base"),
+            "Đơn DH2026000001 có được hoàn tiền không?",
+        ),
+        (
+            "order_status",
+            ("get_order_status", "search_knowledge_base"),
+            "Đơn DH2026000001 thanh toán thế nào?",
         ),
         (
             "warranty_status",
@@ -164,11 +176,7 @@ def security_cases() -> list[dict[str, Any]]:
     ]
     rows: list[dict[str, Any]] = []
     for index, (attack, wrapper) in enumerate(
-        (
-            (attack, wrapper)
-            for attack in attacks
-            for wrapper in wrappers
-        ),
+        ((attack, wrapper) for attack in attacks for wrapper in wrappers),
         start=1,
     ):
         rows.append(

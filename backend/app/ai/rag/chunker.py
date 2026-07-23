@@ -70,9 +70,7 @@ class SectionAwareChunker:
                 heading = HEADING_PATTERN.match(line)
                 if heading:
                     if current_lines:
-                        sections.append(
-                            _Section(page=page, path=current_path, lines=current_lines)
-                        )
+                        sections.append(_Section(page=page, path=current_path, lines=current_lines))
                         current_lines = []
                     level = len(heading.group(1))
                     title = heading.group(2).strip()

@@ -54,6 +54,8 @@ class OutputVerifier:
             errors.append("CITATION_REQUIRED")
         if citation_check.unknown:
             errors.append("UNKNOWN_CITATION")
+        if citation_check.unsupported:
+            errors.append("UNSUPPORTED_CITATION")
         if any(pattern.search(answer) for pattern in SECRET_PATTERNS):
             errors.append("SECRET_PATTERN")
         if any(pattern.search(answer) for pattern in UNSUPPORTED_PROMISE_PATTERNS):

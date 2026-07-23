@@ -42,9 +42,7 @@ class KnowledgeSearchService:
         fused = await self.retriever.retrieve(query, category=category)
         reranked = await self.reranker.rerank(query, fused)
         evidence = reranked[: self.final_k]
-        insufficient = (
-            not evidence or evidence[0].fused_score < self.minimum_score
-        )
+        insufficient = not evidence or evidence[0].fused_score < self.minimum_score
         versions_by_title: dict[str, set[str]] = {}
         for item in evidence:
             versions_by_title.setdefault(item.title.casefold(), set()).add(item.version)

@@ -35,4 +35,3 @@ async def ready(request: Request) -> HealthResponse:
     except Exception as error:
         raise ServiceNotReadyError from error
     return HealthResponse(status="ok", service="vietnamese-customer-support-rag")
-

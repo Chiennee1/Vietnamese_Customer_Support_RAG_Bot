@@ -5,9 +5,13 @@ from uuid import UUID, uuid4
 from fastapi.testclient import TestClient
 
 from app.ai.rag.chunker import SectionAwareChunker
+from app.db.models.conversation import MessageRole
 from app.db.models.knowledge import DocumentStatus
+from app.db.models.ticket import TicketSeverity, TicketStatus
 from app.db.models.user import User, UserRole
 from app.main import create_app
+from app.repositories.conversations import EscalationReviewRecord, MessageRecord
+from app.repositories.tickets import TicketReviewRecord
 from app.services.auth import PASSWORD_HASH, AuthService
 from app.services.documents import (
     DocumentIngestionService,
@@ -15,6 +19,7 @@ from app.services.documents import (
     EmbeddedChunk,
 )
 from app.services.ingestion_jobs import IngestionJobRunner
+from app.services.operations import OperationsReviewService
 
 
 class HealthyProbe:
@@ -84,11 +89,7 @@ class MemoryDocuments:
         self,
         statuses: set[DocumentStatus],
     ) -> list[DocumentRecord]:
-        return [
-            document
-            for document in self.documents.values()
-            if document.status in statuses
-        ]
+        return [document for document in self.documents.values() if document.status in statuses]
 
     async def transition(
         self,
@@ -128,6 +129,91 @@ class TinyEmbeddings:
         return [[1.0, float(len(text))] for text in texts]
 
 
+class MemoryEscalations:
+    def __init__(self) -> None:
+        self.conversation_id = uuid4()
+
+    async def list_escalations(
+        self,
+        *,
+        limit: int = 50,
+    ) -> list[EscalationReviewRecord]:
+        return [
+            EscalationReviewRecord(
+                conversation_id=self.conversation_id,
+                title="Máy lỗi lặp lại",
+                human_reason="CUSTOMER_COMPLAINT",
+                ticket_code="TK20260001",
+                raised_at=datetime(2026, 7, 23, tzinfo=UTC),
+            )
+        ][:limit]
+
+    async def get_escalation_messages(
+        self,
+        conversation_id: UUID,
+        *,
+        limit: int = 100,
+    ) -> list[MessageRecord] | None:
+        if conversation_id != self.conversation_id:
+            return None
+        return [
+            MessageRecord(
+                id=uuid4(),
+                conversation_id=conversation_id,
+                role=MessageRole.USER,
+                content="Camera tiếp tục lỗi sau nhiều lần sửa.",
+                intent=None,
+                route=None,
+                model_name=None,
+                latency_ms=None,
+                citations=[],
+                requires_human=False,
+                human_reason=None,
+                suggested_actions=[],
+                ticket_code=None,
+                warranty_assessment=None,
+                created_at=datetime(2026, 7, 23, tzinfo=UTC),
+            ),
+            MessageRecord(
+                id=uuid4(),
+                conversation_id=conversation_id,
+                role=MessageRole.ASSISTANT,
+                content="Vấn đề cần nhân viên xem xét.",
+                intent="complaint",
+                route=None,
+                model_name=None,
+                latency_ms=10,
+                citations=[],
+                requires_human=True,
+                human_reason="CUSTOMER_COMPLAINT",
+                suggested_actions=["confirm_ticket_creation"],
+                ticket_code="TK20260001",
+                warranty_assessment=None,
+                created_at=datetime(2026, 7, 23, tzinfo=UTC),
+            ),
+        ][:limit]
+
+
+class MemoryTicketReviews:
+    async def list_for_review(
+        self,
+        *,
+        limit: int = 50,
+    ) -> list[TicketReviewRecord]:
+        return [
+            TicketReviewRecord(
+                ticket_code="TK20260001",
+                conversation_id=uuid4(),
+                category="customer_complaint",
+                subject="Yêu cầu hỗ trợ",
+                summary="Camera tiếp tục lỗi sau nhiều lần sửa.",
+                status=TicketStatus.OPEN,
+                severity=TicketSeverity.HIGH,
+                created_at=datetime(2026, 7, 23, tzinfo=UTC),
+            )
+        ][:limit]
+
+
 def make_client() -> tuple[TestClient, AuthService]:
     password_hash = PASSWORD_HASH.hash("Document-admin-2026")
     users = [
@@ -137,6 +223,14 @@ def make_client() -> tuple[TestClient, AuthService]:
             full_name="Admin Demo",
             password_hash=password_hash,
             role=UserRole.ADMIN,
+            is_active=True,
+        ),
+        User(
+            id=uuid4(),
+            email="support@example.test",
+            full_name="Support Demo",
+            password_hash=password_hash,
+            role=UserRole.SUPPORT,
             is_active=True,
         ),
         User(
@@ -172,6 +266,10 @@ def make_client() -> tuple[TestClient, AuthService]:
             auth_service=auth,
             document_service=documents,
             ingestion_runner=runner,
+            operations_service=OperationsReviewService(
+                conversations=MemoryEscalations(),
+                tickets=MemoryTicketReviews(),
+            ),
         )
     )
     return client, auth
@@ -224,10 +322,11 @@ def test_only_admin_can_upload_and_list_documents() -> None:
     assert listed.json()[0]["status"] == "ready"
 
 
-def test_operational_metrics_are_admin_only_and_contain_no_secrets() -> None:
+def test_operational_metrics_are_staff_only_and_contain_no_secrets() -> None:
     client, auth = make_client()
     customer_token = login(auth, "customer@example.test")
     admin_token = login(auth, "admin@example.test")
+    support_token = login(auth, "support@example.test")
 
     forbidden = client.get(
         "/api/v1/admin/metrics",
@@ -237,10 +336,50 @@ def test_operational_metrics_are_admin_only_and_contain_no_secrets() -> None:
         "/api/v1/admin/metrics",
         headers={"authorization": f"Bearer {admin_token}"},
     )
+    support_allowed = client.get(
+        "/api/v1/admin/metrics",
+        headers={"authorization": f"Bearer {support_token}"},
+    )
 
     assert forbidden.status_code == 403
     assert allowed.status_code == 200
+    assert support_allowed.status_code == 200
     assert {"api", "chat", "rag", "feedback"} <= set(allowed.json())
     lowered = allowed.text.casefold()
     assert "authorization" not in lowered
     assert "access_token" not in lowered
+
+
+def test_staff_can_read_bounded_review_queues_but_customer_cannot() -> None:
+    client, auth = make_client()
+    customer_token = login(auth, "customer@example.test")
+    support_token = login(auth, "support@example.test")
+
+    forbidden = client.get(
+        "/api/v1/admin/review/escalations",
+        headers={"authorization": f"Bearer {customer_token}"},
+    )
+    escalations = client.get(
+        "/api/v1/admin/review/escalations",
+        headers={"authorization": f"Bearer {support_token}"},
+    )
+    tickets = client.get(
+        "/api/v1/admin/review/tickets",
+        headers={"authorization": f"Bearer {support_token}"},
+    )
+    conversation_id = escalations.json()[0]["conversation_id"]
+    transcript = client.get(
+        f"/api/v1/admin/review/escalations/{conversation_id}/messages",
+        headers={"authorization": f"Bearer {support_token}"},
+    )
+
+    assert forbidden.status_code == 403
+    assert escalations.status_code == 200
+    assert escalations.json()[0]["human_reason"] == "CUSTOMER_COMPLAINT"
+    assert "user_id" not in escalations.text
+    assert tickets.status_code == 200
+    assert tickets.json()[0]["ticket_code"] == "TK20260001"
+    assert "user_id" not in tickets.text
+    assert transcript.status_code == 200
+    assert [row["role"] for row in transcript.json()] == ["user", "assistant"]
+    assert "user_id" not in transcript.text

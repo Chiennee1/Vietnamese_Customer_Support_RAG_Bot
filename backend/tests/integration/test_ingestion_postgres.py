@@ -52,9 +52,7 @@ async def test_ingestion_lifecycle_is_transactional_on_postgres(
     try:
         async with database.sessions() as session:
             await session.execute(
-                delete(KnowledgeDocument).where(
-                    KnowledgeDocument.title == checksum_title
-                )
+                delete(KnowledgeDocument).where(KnowledgeDocument.title == checksum_title)
             )
             uploader = await session.scalar(
                 select(User).where(User.email == "customer0000@example.test")
@@ -86,10 +84,7 @@ async def test_ingestion_lifecycle_is_transactional_on_postgres(
     finally:
         async with database.sessions() as session:
             await session.execute(
-                delete(KnowledgeDocument).where(
-                    KnowledgeDocument.title == checksum_title
-                )
+                delete(KnowledgeDocument).where(KnowledgeDocument.title == checksum_title)
             )
             await session.commit()
         await database.dispose()
-

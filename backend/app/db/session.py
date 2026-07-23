@@ -12,9 +12,14 @@ from app.core.config import Settings
 
 
 class Database:
-    def __init__(self, settings: Settings) -> None:
+    def __init__(
+        self,
+        settings: Settings,
+        *,
+        database_url: str | None = None,
+    ) -> None:
         self.engine: AsyncEngine = create_async_engine(
-            settings.database_url.get_secret_value(),
+            database_url or settings.database_url.get_secret_value(),
             pool_pre_ping=True,
             pool_recycle=1800,
         )
@@ -39,4 +44,3 @@ class DatabaseReadinessProbe:
     async def check(self) -> None:
         async with self.database.sessions() as session:
             await session.execute(text("SELECT 1"))
-

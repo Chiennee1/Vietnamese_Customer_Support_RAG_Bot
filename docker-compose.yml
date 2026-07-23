@@ -23,12 +23,20 @@ services:
       - -c
       - >-
         uv run --no-sync alembic upgrade head &&
-        uv run --no-sync uvicorn app.main:app --host 0.0.0.0 --port 8000
+        uv run --no-sync python -m app.db.provision_runtime_role &&
+        unset MIGRATION_DATABASE_URL RUNTIME_DB_PASSWORD AGENT_DB_PASSWORD &&
+        exec uv run --no-sync uvicorn app.main:app --host 0.0.0.0 --port 8000
     environment:
       APP_ENV: ${APP_ENV:-development}
       APP_SECRET: ${APP_SECRET:-local-development-secret}
       JWT_SECRET: ${JWT_SECRET:-local-jwt-secret}
-      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://app:local-password@db:5432/support_rag}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://app_runtime:local-runtime-password@db:5432/support_rag}
+      AGENT_DATABASE_URL: ${AGENT_DATABASE_URL:-postgresql+asyncpg://app_agent:local-agent-password@db:5432/support_rag}
+      MIGRATION_DATABASE_URL: ${MIGRATION_DATABASE_URL:-postgresql+asyncpg://app:local-password@db:5432/support_rag}
+      RUNTIME_DB_ROLE: ${RUNTIME_DB_ROLE:-app_runtime}
+      RUNTIME_DB_PASSWORD: ${RUNTIME_DB_PASSWORD:-local-runtime-password}
+      AGENT_DB_ROLE: ${AGENT_DB_ROLE:-app_agent}
+      AGENT_DB_PASSWORD: ${AGENT_DB_PASSWORD:-local-agent-password}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       LLM_PROVIDER: ${LLM_PROVIDER:-openai}

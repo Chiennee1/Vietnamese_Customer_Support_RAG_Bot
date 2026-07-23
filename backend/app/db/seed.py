@@ -83,11 +83,7 @@ def build_synthetic_dataset(seed: int = 20260723) -> SyntheticDataset:
                 f"Điện thoại {brand} dùng cho bộ dữ liệu synthetic, "
                 "không đại diện cho sản phẩm thương mại thật."
             ),
-            status=(
-                ProductStatus.ARCHIVED
-                if product_index >= 95
-                else ProductStatus.ACTIVE
-            ),
+            status=(ProductStatus.ARCHIVED if product_index >= 95 else ProductStatus.ACTIVE),
         )
         products.append(product)
         for variant_offset in range(3):
@@ -143,14 +139,12 @@ def build_synthetic_dataset(seed: int = 20260723) -> SyntheticDataset:
                     else None
                 ),
                 estimated_delivery_at=(
-                    datetime(2026, 7, 24, tzinfo=UTC)
-                    + timedelta(days=order_index % 7)
+                    datetime(2026, 7, 24, tzinfo=UTC) + timedelta(days=order_index % 7)
                     if order_status in {OrderStatus.CONFIRMED, OrderStatus.SHIPPING}
                     else None
                 ),
                 delivered_at=(
-                    datetime(2026, 7, 20, tzinfo=UTC)
-                    - timedelta(days=order_index % 30)
+                    datetime(2026, 7, 20, tzinfo=UTC) - timedelta(days=order_index % 30)
                     if order_status == OrderStatus.DELIVERED
                     else None
                 ),
@@ -204,8 +198,7 @@ def build_synthetic_dataset(seed: int = 20260723) -> SyntheticDataset:
             subject=f"Yêu cầu hỗ trợ synthetic {index + 1}",
             category=("delivery", "warranty", "product")[index % 3],
             summary=(
-                "Tình huống giả lập để kiểm thử quy trình CSKH; "
-                "không chứa dữ liệu khách hàng thật."
+                "Tình huống giả lập để kiểm thử quy trình CSKH; không chứa dữ liệu khách hàng thật."
             ),
             severity=severities[index % len(severities)],
             status=TicketStatus.OPEN,

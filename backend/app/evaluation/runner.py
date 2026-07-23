@@ -101,9 +101,7 @@ def _offline_lexical_rag(
         examples.append(
             RetrievalExample(
                 query=case.query,
-                expected_chunk_ids={
-                    f"{case.expected_title}|{case.expected_section}"
-                },
+                expected_chunk_ids={f"{case.expected_title}|{case.expected_section}"},
                 retrieved_chunk_ids=[item.key for item in ranked[:k]],
             )
         )

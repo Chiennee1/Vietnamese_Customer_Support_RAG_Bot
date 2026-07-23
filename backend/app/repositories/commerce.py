@@ -1,12 +1,14 @@
+import re
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Protocol
 from uuid import UUID
 
-from sqlalchemy import case, func, or_, select
+from sqlalchemy import and_, case, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from app.ai.router import normalize_for_routing
 from app.db.models.catalog import Inventory, Product, ProductStatus, ProductVariant
 from app.db.models.order import Order, OrderItem, OrderStatus
 from app.db.models.warranty import Warranty, WarrantyStatus
@@ -66,6 +68,7 @@ class ProductRepository(Protocol):
         brand: str | None,
         max_price: Decimal | None,
         storage_gb: int | None,
+        color: str | None,
         limit: int,
     ) -> list[ProductLookupResult]: ...
 
@@ -89,6 +92,49 @@ class WarrantyRepository(Protocol):
 
 
 class SqlAlchemyProductRepository:
+    _QUERY_STOPWORDS = {
+        "bao",
+        "ban",
+        "co",
+        "con",
+        "cua",
+        "dang",
+        "den",
+        "dien",
+        "duoi",
+        "gb",
+        "gia",
+        "gi",
+        "giup",
+        "hang",
+        "hien",
+        "hop",
+        "khong",
+        "kiem",
+        "mau",
+        "may",
+        "muon",
+        "nao",
+        "nhieu",
+        "nhien",
+        "nho",
+        "phu",
+        "phone",
+        "san",
+        "tai",
+        "titan",
+        "thoai",
+        "tim",
+        "toi",
+        "tra",
+        "trieu",
+        "trang",
+        "tu",
+        "van",
+        "xem",
+        "xanh",
+    }
+
     def __init__(self, sessions: async_sessionmaker[AsyncSession]) -> None:
         self.sessions = sessions
 
@@ -99,14 +145,11 @@ class SqlAlchemyProductRepository:
         brand: str | None,
         max_price: Decimal | None,
         storage_gb: int | None,
+        color: str | None,
         limit: int,
     ) -> list[ProductLookupResult]:
         normalized_query = query.strip()
-        escaped_query = (
-            normalized_query.replace("\\", "\\\\")
-            .replace("%", "\\%")
-            .replace("_", "\\_")
-        )
+        search_terms = self._search_terms(normalized_query)
         available = func.coalesce(
             func.sum(Inventory.quantity_on_hand - Inventory.quantity_reserved),
             0,
@@ -116,15 +159,22 @@ class SqlAlchemyProductRepository:
             (func.lower(ProductVariant.model) == normalized_query.lower(), 1),
             else_=2,
         )
+        searchable = func.concat_ws(
+            " ",
+            ProductVariant.sku,
+            ProductVariant.model,
+            Product.name,
+            Product.brand,
+            Product.description,
+            ProductVariant.color,
+        )
+        term_filters = [
+            searchable.ilike(f"%{self._escape_like(term)}%", escape="\\") for term in search_terms
+        ]
         filters = [
             Product.status == ProductStatus.ACTIVE,
             ProductVariant.is_active.is_(True),
-            or_(
-                ProductVariant.sku.ilike(f"%{escaped_query}%", escape="\\"),
-                ProductVariant.model.ilike(f"%{escaped_query}%", escape="\\"),
-                Product.name.ilike(f"%{escaped_query}%", escape="\\"),
-                Product.description.ilike(f"%{escaped_query}%", escape="\\"),
-            ),
+            and_(*term_filters),
         ]
         if brand:
             filters.append(Product.brand.ilike(brand))
@@ -132,6 +182,8 @@ class SqlAlchemyProductRepository:
             filters.append(ProductVariant.current_price <= max_price)
         if storage_gb is not None:
             filters.append(ProductVariant.storage_gb == storage_gb)
+        if color:
+            filters.append(func.lower(ProductVariant.color) == color.casefold())
 
         statement = (
             select(Product, ProductVariant, available)
@@ -162,6 +214,31 @@ class SqlAlchemyProductRepository:
             for product, variant, quantity_available in rows
         ]
 
+    @classmethod
+    def _search_terms(cls, query: str) -> tuple[str, ...]:
+        normalized = normalize_for_routing(query)
+        normalized = normalized.replace("iphone", "apple").replace(
+            "pixel",
+            "google",
+        )
+        normalized = re.sub(
+            r"\b(?:duoi|khong qua|toi da|tam|khoang)\s*"
+            r"\d+(?:[.,]\d+)?\s*(?:trieu|tr)\b",
+            " ",
+            normalized,
+        )
+        normalized = re.sub(r"\b\d{2,4}\s*(?:gb|g)\b", " ", normalized)
+        terms = [
+            token
+            for token in re.findall(r"[a-z0-9_-]+", normalized)
+            if len(token) >= 2 and token not in cls._QUERY_STOPWORDS
+        ]
+        return tuple(dict.fromkeys(terms)) or (normalized[:40],)
+
+    @staticmethod
+    def _escape_like(value: str) -> str:
+        return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
 
 class SqlAlchemyOrderRepository:
     def __init__(self, sessions: async_sessionmaker[AsyncSession]) -> None:
@@ -189,6 +266,7 @@ class SqlAlchemyOrderRepository:
                     .join(Product, Product.id == ProductVariant.product_id)
                     .where(OrderItem.order_id == order.id)
                     .order_by(OrderItem.created_at)
+                    .limit(100)
                 )
             ).all()
             return OrderLookupResult(

@@ -1,4 +1,4 @@
-export type UserRole = "customer" | "admin";
+export type UserRole = "customer" | "support" | "admin";
 
 export interface User {
   id: string;
@@ -35,6 +35,11 @@ export interface ChatResponse {
   human_reason: string | null;
   suggested_actions: string[];
   ticket_code: string | null;
+  warranty_assessment:
+    | "eligible"
+    | "ineligible"
+    | "needs_manual_review"
+    | null;
 }
 
 export interface ChatMessage {
@@ -47,6 +52,11 @@ export interface ChatMessage {
   human_reason: string | null;
   suggested_actions: string[];
   ticket_code: string | null;
+  warranty_assessment:
+    | "eligible"
+    | "ineligible"
+    | "needs_manual_review"
+    | null;
   created_at: string;
   pending?: boolean;
   failed?: boolean;
@@ -87,4 +97,46 @@ export interface KnowledgeDocument {
   effective_to: string | null;
   published_at: string | null;
   failure_reason: string | null;
+}
+
+export interface EscalationReview {
+  conversation_id: string;
+  title: string | null;
+  human_reason: string | null;
+  ticket_code: string | null;
+  raised_at: string;
+}
+
+export interface ControlledReviewMessage {
+  role: "user" | "assistant";
+  content: string;
+  created_at: string;
+  requires_human: boolean;
+  human_reason: string | null;
+}
+
+export interface TicketReview {
+  ticket_code: string;
+  conversation_id: string | null;
+  category: string;
+  subject: string;
+  summary: string;
+  status: "open" | "in_review" | "resolved";
+  severity: "normal" | "high" | "critical";
+  created_at: string;
+}
+
+export interface OperationsMetrics {
+  chat: {
+    latency: {
+      count: number;
+      p95_ms: number;
+    };
+    human_escalation_rate: number;
+    tickets_created: number;
+  };
+  rag: {
+    requests?: number;
+    no_result?: number;
+  };
 }

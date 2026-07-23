@@ -16,4 +16,3 @@ def normalize_text(value: str) -> str:
 
 def normalize_for_search(value: str) -> str:
     return normalize_text(value).casefold()
-

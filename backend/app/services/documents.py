@@ -181,14 +181,10 @@ class DocumentIngestionService:
                 document.media_type,
                 max_pdf_pages=self.max_pdf_pages,
             )
-            drafts = self.chunker.chunk_pages(
-                [(page.page, page.text) for page in pages]
-            )
+            drafts = self.chunker.chunk_pages([(page.page, page.text) for page in pages])
             if not drafts:
                 raise ValueError("document produced no chunks")
-            vectors = await self.embeddings.embed_documents(
-                [draft.content for draft in drafts]
-            )
+            vectors = await self.embeddings.embed_documents([draft.content for draft in drafts])
             if len(vectors) != len(drafts) or any(
                 len(vector) != self.embeddings.dimensions for vector in vectors
             ):

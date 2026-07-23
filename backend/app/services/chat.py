@@ -163,6 +163,7 @@ class ChatService:
             ConversationTurn(role=record.role.value, content=record.content)
             for record in history_records[-self.history_limit :]
         )
+        tool_trace_sink: list[dict[str, object]] = []
         orchestration_started = perf_counter()
         try:
             async with asyncio.timeout(self.request_timeout_seconds):
@@ -174,10 +175,16 @@ class ChatService:
                         user_role=user_role,
                         conversation_id=conversation.id,
                         message_id=user_message_id,
+                        tool_trace_sink=tool_trace_sink,
                     ),
                     history=history,
                 )
         except AppError as error:
+            await self._persist_failed_tool_executions(
+                error=error,
+                conversation_id=conversation.id,
+                message_id=user_message_id,
+            )
             total_latency_ms = max(
                 0,
                 round((perf_counter() - request_started) * 1000),
@@ -195,6 +202,17 @@ class ChatService:
             )
             raise
         except TimeoutError as error:
+            timeout_error = AppError(
+                code="REQUEST_TIMEOUT",
+                message="Yêu cầu hỗ trợ phản hồi quá thời gian.",
+                status_code=504,
+                internal_context={"tool_executions": tool_trace_sink},
+            )
+            await self._persist_failed_tool_executions(
+                error=timeout_error,
+                conversation_id=conversation.id,
+                message_id=user_message_id,
+            )
             total_latency_ms = max(
                 0,
                 round((perf_counter() - request_started) * 1000),
@@ -210,11 +228,7 @@ class ChatService:
                 error_code="REQUEST_TIMEOUT",
                 total_latency_ms=total_latency_ms,
             )
-            raise AppError(
-                code="REQUEST_TIMEOUT",
-                message="Yêu cầu hỗ trợ phản hồi quá thời gian.",
-                status_code=504,
-            ) from error
+            raise timeout_error from error
         orchestration_latency_ms = max(
             0,
             round((perf_counter() - orchestration_started) * 1000),
@@ -246,6 +260,9 @@ class ChatService:
                 human_reason=result.human_reason,
                 suggested_actions=list(result.suggested_actions),
                 ticket_code=result.ticket_code,
+                warranty_assessment=(
+                    result.warranty_assessment.value if result.warranty_assessment else None
+                ),
             )
         )
         await self.conversations.add_tool_executions(
@@ -254,8 +271,9 @@ class ChatService:
                     conversation_id=conversation.id,
                     message_id=assistant_message_id,
                     tool_name=trace.name,
-                    status=ToolExecutionStatus.SUCCESS,
+                    status=trace.status,
                     duration_ms=trace.duration_ms,
+                    error_code=trace.error_code,
                 )
                 for trace in result.tool_executions
             ]
@@ -284,6 +302,43 @@ class ChatService:
             total_latency_ms=total_latency_ms,
         )
         return ChatResult(conversation_id=conversation.id, message=assistant)
+
+    async def _persist_failed_tool_executions(
+        self,
+        *,
+        error: AppError,
+        conversation_id: UUID,
+        message_id: UUID,
+    ) -> None:
+        raw_traces = (error.internal_context or {}).get("tool_executions", [])
+        if not isinstance(raw_traces, list):
+            return
+        records: list[ToolExecutionCreateRecord] = []
+        for trace in raw_traces:
+            if not isinstance(trace, dict):
+                continue
+            try:
+                records.append(
+                    ToolExecutionCreateRecord(
+                        conversation_id=conversation_id,
+                        message_id=message_id,
+                        tool_name=str(trace["name"]),
+                        status=ToolExecutionStatus(str(trace["status"])),
+                        duration_ms=int(trace["duration_ms"]),
+                        error_code=(str(trace["error_code"]) if trace.get("error_code") else None),
+                    )
+                )
+            except (KeyError, TypeError, ValueError):
+                continue
+        if not records:
+            return
+        try:
+            await self.conversations.add_tool_executions(records)
+        except Exception as persistence_error:
+            structlog.get_logger().warning(
+                "tool_trace_persistence_failed",
+                error_type=type(persistence_error).__name__,
+            )
 
     async def list_conversations(
         self,

@@ -11,6 +11,7 @@ class AppError(Exception):
     message: str
     status_code: int
     details: dict[str, Any] | None = None
+    internal_context: dict[str, Any] | None = None
 
 
 class ServiceNotReadyError(AppError):
@@ -33,4 +34,3 @@ async def app_error_handler(request: Request, exc: Exception) -> JSONResponse:
     if exc.details:
         payload["error"]["details"] = exc.details
     return JSONResponse(status_code=exc.status_code, content=payload)
-

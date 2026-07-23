@@ -52,7 +52,4 @@ def structlog_redactor(
     __: str,
     event_dict: MutableMapping[str, Any],
 ) -> Mapping[str, Any]:
-    return {
-        key: redact_value(value, key=key)
-        for key, value in event_dict.items()
-    }
+    return {key: redact_value(value, key=key) for key, value in event_dict.items()}

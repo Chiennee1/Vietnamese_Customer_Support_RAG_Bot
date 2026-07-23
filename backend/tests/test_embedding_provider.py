@@ -56,4 +56,3 @@ async def test_openai_embeddings_are_batched_without_losing_order() -> None:
 
     assert fake_client.embeddings.batch_sizes == [2, 2, 1]
     assert [embedding[0] for embedding in result] == [1.0, 2.0, 3.0, 4.0, 5.0]
-

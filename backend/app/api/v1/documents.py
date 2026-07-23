@@ -57,10 +57,7 @@ async def list_documents(
     _: Annotated[AuthenticatedIdentity, Depends(require_admin)],
     service: Annotated[DocumentIngestionService, Depends(get_document_service)],
 ) -> list[DocumentResponse]:
-    return [
-        DocumentResponse.from_record(document)
-        for document in await service.list_documents()
-    ]
+    return [DocumentResponse.from_record(document) for document in await service.list_documents()]
 
 
 @router.get("/{document_id}", response_model=DocumentResponse)

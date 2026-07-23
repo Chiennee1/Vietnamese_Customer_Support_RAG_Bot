@@ -70,6 +70,10 @@ class Message(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         default=list,
     )
     ticket_code: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    warranty_assessment: Mapped[str | None] = mapped_column(
+        String(30),
+        nullable=True,
+    )
 
 
 class ToolExecution(UUIDPrimaryKeyMixin, TimestampMixin, Base):

@@ -11,7 +11,9 @@ Production-portfolio release:
 - Guarded Vietnamese support orchestration, complaint severity and human handoff.
 - Persistent chat, SSE, feedback and React admin/customer workspace.
 - Structured redacted logs, process metrics, rate limit, timeout and retention.
-- 464 deterministic RAG/agent/security cases and local load smoke.
+- 509 deterministic RAG/agent/security cases and local load smoke.
+- Least-privilege runtime database role, failed-tool audit traces, lexical
+  citation-support guard and staff operations review queues.
 - Docker Compose, Railway monorepo configuration, GitHub Actions CI, backup,
   security, privacy, operations and portfolio documentation.
 

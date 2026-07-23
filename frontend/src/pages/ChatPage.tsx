@@ -15,6 +15,7 @@ import {
   CircleUserRound,
   FileText,
   History,
+  Gauge,
   LogOut,
   Menu,
   MessageSquarePlus,
@@ -55,6 +56,7 @@ function emptyAssistant(id: string): ChatMessage {
     human_reason: null,
     suggested_actions: [],
     ticket_code: null,
+    warranty_assessment: null,
     created_at: new Date().toISOString(),
     pending: true,
   };
@@ -71,6 +73,7 @@ function userMessage(content: string): ChatMessage {
     human_reason: null,
     suggested_actions: [],
     ticket_code: null,
+    warranty_assessment: null,
     created_at: new Date().toISOString(),
   };
 }
@@ -93,6 +96,14 @@ function actionLabel(action: string): string {
 function actionMessage(action: string): string {
   if (action === "confirm_ticket_creation") return "Đồng ý tạo ticket";
   return "Hãy chuyển tôi tới nhân viên hỗ trợ.";
+}
+
+function warrantyAssessmentLabel(
+  value: ChatMessage["warranty_assessment"],
+): string {
+  if (value === "eligible") return "Đủ điều kiện tiếp nhận sơ bộ";
+  if (value === "ineligible") return "Không đủ điều kiện theo thời hạn";
+  return "Cần kiểm tra thủ công";
 }
 
 export function ChatPage() {
@@ -256,6 +267,7 @@ export function ChatPage() {
                       human_reason: data.human_reason,
                       suggested_actions: data.suggested_actions,
                       ticket_code: data.ticket_code,
+                      warranty_assessment: data.warranty_assessment,
                       pending: false,
                     }
                   : item,
@@ -334,6 +346,12 @@ export function ChatPage() {
           Nguồn dữ liệu được giới hạn
         </div>
         <div className="header-actions">
+          {user?.role === "support" || user?.role === "admin" ? (
+            <Link className="quiet-link" to="/admin/operations">
+              <Gauge size={17} />
+              Vận hành
+            </Link>
+          ) : null}
           {user?.role === "admin" ? (
             <Link className="quiet-link" to="/admin/knowledge">
               <BookOpenCheck size={17} />
@@ -521,6 +539,12 @@ export function ChatPage() {
                       <span className="typing-cursor" aria-label="Đang trả lời" />
                     ) : null}
                   </p>
+                  {message.warranty_assessment ? (
+                    <div className="assessment-chip">
+                      <ShieldCheck size={14} />
+                      {warrantyAssessmentLabel(message.warranty_assessment)}
+                    </div>
+                  ) : null}
                   {message.requires_human ? (
                     <div className="handoff-notice">
                       <CircleUserRound size={18} />

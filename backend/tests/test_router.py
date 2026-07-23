@@ -19,6 +19,30 @@ from app.ai.router import Intent, Route, SupportRouter
             ("get_order_status",),
         ),
         (
+            "Đơn DH2026000001 có đủ điều kiện đổi trả không?",
+            Route.ACCOUNT,
+            Intent.ORDER_STATUS,
+            ("get_order_status", "search_knowledge_base"),
+        ),
+        (
+            "Đơn DH2026000001 có được hoàn tiền không?",
+            Route.ACCOUNT,
+            Intent.ORDER_STATUS,
+            ("get_order_status", "search_knowledge_base"),
+        ),
+        (
+            "Đơn DH2026000001 thanh toán thế nào?",
+            Route.ACCOUNT,
+            Intent.ORDER_STATUS,
+            ("get_order_status", "search_knowledge_base"),
+        ),
+        (
+            "Đơn DH2026000001 áp dụng chính sách vận chuyển nào?",
+            Route.ACCOUNT,
+            Intent.ORDER_STATUS,
+            ("get_order_status", "search_knowledge_base"),
+        ),
+        (
             "serial SN2600000001 còn bảo hành không?",
             Route.ACCOUNT,
             Intent.WARRANTY_STATUS,
@@ -34,6 +58,12 @@ from app.ai.router import Intent, Route, SupportRouter
             "Chính sách đổi trả thế nào?",
             Route.KNOWLEDGE,
             Intent.RETURN_POLICY,
+            ("search_knowledge_base",),
+        ),
+        (
+            "Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư?",
+            Route.KNOWLEDGE,
+            Intent.FAQ,
             ("search_knowledge_base",),
         ),
         (

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
+from enum import StrEnum
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -18,6 +19,7 @@ class RuntimeContext:
     user_role: UserRole
     conversation_id: UUID | None = None
     message_id: UUID | None = None
+    tool_trace_sink: list[dict[str, object]] | None = None
 
 
 class StrictToolInput(BaseModel):
@@ -29,6 +31,7 @@ class ProductSearchInput(StrictToolInput):
     brand: str | None = Field(default=None, max_length=100)
     max_price: Decimal | None = Field(default=None, ge=0)
     storage_gb: int | None = Field(default=None, ge=16, le=2048)
+    color: str | None = Field(default=None, max_length=50)
     limit: int = Field(default=5, ge=1, le=10)
 
 
@@ -96,6 +99,12 @@ class WarrantyStatusOutput(BaseModel):
     ends_on: date
     status: WarrantyStatus
     checked_at: datetime
+
+
+class WarrantyAssessment(StrEnum):
+    ELIGIBLE = "eligible"
+    INELIGIBLE = "ineligible"
+    NEEDS_MANUAL_REVIEW = "needs_manual_review"
 
 
 class KnowledgeSearchInput(StrictToolInput):

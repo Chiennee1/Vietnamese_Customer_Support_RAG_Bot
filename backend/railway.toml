@@ -4,7 +4,7 @@ dockerfilePath = "Dockerfile"
 watchPatterns = ["/backend/**"]
 
 [deploy]
-preDeployCommand = ["uv run --no-sync alembic upgrade head"]
+preDeployCommand = ["uv run --no-sync alembic upgrade head && uv run --no-sync python -m app.db.provision_runtime_role"]
 healthcheckPath = "/api/v1/health/ready"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"

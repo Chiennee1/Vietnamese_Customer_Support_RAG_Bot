@@ -36,12 +36,14 @@ async def test_conversation_repository_enforces_owner_and_feedback_scope() -> No
             users = (
                 await session.scalars(
                     select(User)
-                    .where(User.email.in_(
-                        [
-                            "customer0006@example.test",
-                            "customer0007@example.test",
-                        ]
-                    ))
+                    .where(
+                        User.email.in_(
+                            [
+                                "customer0006@example.test",
+                                "customer0007@example.test",
+                            ]
+                        )
+                    )
                     .order_by(User.email)
                 )
             ).all()
@@ -83,14 +85,20 @@ async def test_conversation_repository_enforces_owner_and_feedback_scope() -> No
             ]
         )
 
-        assert await repository.get_conversation(
-            conversation.id,
-            user_id=stranger.id,
-        ) is None
-        assert await repository.list_messages(
-            conversation.id,
-            user_id=stranger.id,
-        ) is None
+        assert (
+            await repository.get_conversation(
+                conversation.id,
+                user_id=stranger.id,
+            )
+            is None
+        )
+        assert (
+            await repository.list_messages(
+                conversation.id,
+                user_id=stranger.id,
+            )
+            is None
+        )
         assert (
             await repository.upsert_feedback(
                 message_id=assistant_message.id,
@@ -177,14 +185,20 @@ async def test_retention_repository_deletes_only_expired_conversations() -> None
         )
 
         assert deleted == 1
-        assert await repository.get_conversation(
-            expired.id,
-            user_id=owner.id,
-        ) is None
-        assert await repository.get_conversation(
-            active.id,
-            user_id=owner.id,
-        ) is not None
+        assert (
+            await repository.get_conversation(
+                expired.id,
+                user_id=owner.id,
+            )
+            is None
+        )
+        assert (
+            await repository.get_conversation(
+                active.id,
+                user_id=owner.id,
+            )
+            is not None
+        )
     finally:
         if active_id is not None and owner_id is not None:
             await repository.delete_conversation(active_id, user_id=owner_id)

@@ -109,9 +109,7 @@ class SqlAlchemyDocumentRepository:
         async with self.sessions() as session:
             rows = (
                 await session.scalars(
-                    select(KnowledgeDocument).where(
-                        KnowledgeDocument.status.in_(statuses)
-                    )
+                    select(KnowledgeDocument).where(KnowledgeDocument.status.in_(statuses))
                 )
             ).all()
             return [to_record(row) for row in rows]
@@ -172,9 +170,7 @@ class SqlAlchemyDocumentRepository:
                     status_code=409,
                 )
             await session.execute(
-                delete(KnowledgeChunk).where(
-                    KnowledgeChunk.document_id == document_id
-                )
+                delete(KnowledgeChunk).where(KnowledgeChunk.document_id == document_id)
             )
             session.add_all(
                 [

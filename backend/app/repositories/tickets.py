@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Protocol
 from uuid import UUID, uuid4
 
@@ -27,6 +28,18 @@ class TicketRecord:
     user_id: UUID
     status: TicketStatus
     severity: TicketSeverity
+
+
+@dataclass(frozen=True, slots=True)
+class TicketReviewRecord:
+    ticket_code: str
+    conversation_id: UUID | None
+    category: str
+    subject: str
+    summary: str
+    status: TicketStatus
+    severity: TicketSeverity
+    created_at: datetime
 
 
 class TicketRepositoryProtocol(Protocol):
@@ -85,6 +98,36 @@ class TicketRepository:
                 raise
             await session.refresh(row)
             return self._to_record(row)
+
+    async def list_for_review(
+        self,
+        *,
+        limit: int = 50,
+    ) -> list[TicketReviewRecord]:
+        async with self.sessions() as session:
+            rows = (
+                await session.scalars(
+                    select(SupportTicket)
+                    .order_by(
+                        SupportTicket.created_at.desc(),
+                        SupportTicket.id.desc(),
+                    )
+                    .limit(limit)
+                )
+            ).all()
+        return [
+            TicketReviewRecord(
+                ticket_code=row.ticket_code,
+                conversation_id=row.conversation_id,
+                category=row.category,
+                subject=row.subject,
+                summary=row.summary,
+                status=row.status,
+                severity=row.severity,
+                created_at=row.created_at,
+            )
+            for row in rows
+        ]
 
     @staticmethod
     def _to_record(row: SupportTicket) -> TicketRecord:

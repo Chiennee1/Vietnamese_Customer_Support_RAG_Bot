@@ -40,3 +40,15 @@ async def require_admin(
             status_code=403,
         )
     return identity
+
+
+async def require_staff(
+    identity: Annotated[AuthenticatedIdentity, Depends(get_current_user)],
+) -> AuthenticatedIdentity:
+    if identity.role not in {UserRole.SUPPORT, UserRole.ADMIN}:
+        raise AppError(
+            code="FORBIDDEN_RESOURCE",
+            message="Bạn không có quyền thực hiện thao tác này.",
+            status_code=403,
+        )
+    return identity

@@ -138,6 +138,15 @@ Mọi khoá, SKU, order code, serial, thời gian và giá được giữ nguyê
 - `storage`: file persistence; không chứa business rule.
 - `evaluation`: deterministic release gate.
 
+Router dùng typed deterministic decision thay cho LLM structured output ở V1.
+Đây là lựa chọn security có chủ đích: intent và exact tool allowlist được quyết
+định trước model; câu hỏi kết hợp như trạng thái đơn + đổi trả bắt buộc gọi cả
+order repository lẫn published knowledge. LLM chỉ tổng hợp trusted context.
+
+Database tách ba credential: migration/provision, web runtime không có DDL, và
+`app_agent` read-only cho product/order/warranty/retrieval. Tool tạo ticket là
+side effect duy nhất và dùng service runtime có idempotency + explicit consent.
+
 ## Quyết định scale
 
 V1 cố ý chạy một backend replica vì metric và sliding-window limiter đang nằm

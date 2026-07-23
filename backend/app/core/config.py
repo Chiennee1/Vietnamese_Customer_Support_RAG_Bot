@@ -17,8 +17,22 @@ class Settings(BaseSettings):
     app_secret: SecretStr = SecretStr("change-me")
     api_v1_prefix: str = "/api/v1"
     database_url: SecretStr = SecretStr(
-        "postgresql+asyncpg://app:password@localhost:5432/support_rag"
+        "postgresql+asyncpg://app_runtime:local-runtime-password@localhost:5432/support_rag"
     )
+    agent_database_url: SecretStr = SecretStr(
+        "postgresql+asyncpg://app_agent:local-agent-password@localhost:5432/support_rag"
+    )
+    migration_database_url: SecretStr | None = None
+    runtime_db_role: str = Field(
+        default="app_runtime",
+        pattern=r"^[a-z][a-z0-9_]{2,62}$",
+    )
+    runtime_db_password: SecretStr = SecretStr("local-runtime-password")
+    agent_db_role: str = Field(
+        default="app_agent",
+        pattern=r"^[a-z][a-z0-9_]{2,62}$",
+    )
+    agent_db_password: SecretStr = SecretStr("local-agent-password")
     jwt_secret: SecretStr = SecretStr("change-me")
     access_token_expire_minutes: int = 60
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
@@ -51,14 +65,17 @@ class Settings(BaseSettings):
     conversation_retention_days: int = Field(default=30, ge=1, le=3650)
     retention_interval_seconds: int = Field(default=86_400, ge=60, le=604_800)
 
-    @field_validator("database_url", mode="before")
+    @field_validator(
+        "database_url",
+        "agent_database_url",
+        "migration_database_url",
+        mode="before",
+    )
     @classmethod
     def normalize_async_database_url(cls, value: object) -> object:
-        raw_value = (
-            value.get_secret_value()
-            if isinstance(value, SecretStr)
-            else str(value)
-        )
+        if value is None:
+            return None
+        raw_value = value.get_secret_value() if isinstance(value, SecretStr) else str(value)
         if raw_value.startswith("postgresql://"):
             raw_value = raw_value.replace(
                 "postgresql://",
@@ -83,11 +100,23 @@ class Settings(BaseSettings):
             or self.jwt_secret.get_secret_value() in insecure
         ):
             raise ValueError("Production requires non-default application secrets")
+        runtime_url = self.database_url.get_secret_value()
+        agent_url = self.agent_database_url.get_secret_value()
+        if runtime_url == agent_url:
+            raise ValueError("Production runtime and agent database URLs must differ")
+        if "local-runtime-password" in runtime_url or "local-agent-password" in agent_url:
+            raise ValueError("Production database URLs must not use local passwords")
         return self
 
     @property
     def allowed_cors_origins(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+
+    @property
+    def effective_migration_database_url(self) -> str:
+        if self.migration_database_url is not None:
+            return self.migration_database_url.get_secret_value()
+        return self.database_url.get_secret_value()
 
 
 @lru_cache

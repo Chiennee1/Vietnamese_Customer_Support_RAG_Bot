@@ -33,6 +33,7 @@
 | Request ID log injection | Regex allowlist và giới hạn 64 ký tự |
 | Clickjacking/MIME sniffing | CSP, `frame-ancestors`, `X-Frame-Options`, `nosniff` |
 | Unsupported refund/warranty promise | Output verifier và human handoff rules |
+| Citation gắn sai claim | Label allowlist + lexical claim/source support guard |
 | Unbounded tool/model call | Max tool calls, per-tool timeout và request timeout |
 | Retention vô hạn | 30 ngày mặc định, background cleanup và admin-triggered cleanup |
 
@@ -41,9 +42,13 @@
 - Mật khẩu hash bằng Argon2 qua `pwdlib`.
 - JWT chứa identity đã ký; service không nhận `user_id` từ request body/tool args.
 - `customer`, `support`, `admin` là enum role.
-- Upload/publish/archive, operational metrics và retention manual chỉ dành cho
-  admin.
+- Upload/publish/archive và retention manual chỉ dành cho admin. Metrics cùng
+  hàng đợi escalation/ticket chỉ dành cho support/admin và giới hạn 50 mục.
 - Conversation, message feedback và delete luôn scope theo authenticated owner.
+- Web workflow dùng role PostgreSQL `app_runtime` không có superuser/createdb/
+  createrole/DDL. Catalog/order/warranty/retrieval tools dùng `app_agent` chỉ có
+  SELECT; ticket side effect đi qua service runtime ràng buộc. Migration/provision
+  dùng credential thứ ba tách biệt.
 
 Không yêu cầu password, OTP, full card number hoặc secret qua chat. Không trả
 stack trace hoặc tên tool nội bộ cho khách.
@@ -53,6 +58,10 @@ stack trace hoặc tên tool nội bộ cho khách.
 `.env` bị gitignore. Production secret chỉ đặt trong Railway sealed variables.
 `APP_ENV=production` từ chối secret mặc định/rỗng và tắt OpenAPI docs. Không đặt
 secret vào `VITE_*` vì mọi biến Vite đều được bundle vào browser.
+
+Migration credential và mật khẩu tạo role chỉ tồn tại trong pre-deploy. Entrypoint
+loại `MIGRATION_DATABASE_URL`, `RUNTIME_DB_PASSWORD` và `AGENT_DB_PASSWORD` khỏi
+môi trường Uvicorn trước khi web process chạy; runtime chỉ giữ hai URL ít quyền.
 
 Quy trình rotate:
 
@@ -94,6 +103,11 @@ danh sách origin cấu hình; không dùng wildcard với credential.
   handling phù hợp.
 - Metrics endpoint là snapshot process, chưa thay thế central monitoring/audit
   log bất biến.
+- Citation support guard kiểm tra từng câu, từng mệnh đề và từng lần dùng label:
+  mỗi mệnh đề phải có ít nhất một source hỗ trợ, mỗi source gắn vào phải hỗ trợ
+  ít nhất một mệnh đề, polarity phủ định và mọi số liệu phải khớp. Ở cấp mệnh đề,
+  guard yêu cầu ≥2 term không-generic và ≥70% term có trong source. Đây vẫn là
+  lexical defense, không thay thế reviewer faithfulness end-to-end.
 
 ## Khi nào bắt buộc human review
 

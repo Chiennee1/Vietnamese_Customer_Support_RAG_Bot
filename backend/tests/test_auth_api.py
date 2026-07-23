@@ -70,4 +70,3 @@ def test_me_requires_a_valid_bearer_token() -> None:
     assert invalid.status_code == 401
     assert missing.json()["error"]["code"] == "AUTH_REQUIRED"
     assert invalid.json()["error"]["code"] == "AUTH_REQUIRED"
-

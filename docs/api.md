@@ -23,7 +23,10 @@ gồm chữ/số/`._:-`, tối đa 64 ký tự; giá trị không hợp lệ b�
 | POST | `/documents/{id}/retry` | Admin | Retry failed ingestion, trả 202 |
 | POST | `/documents/{id}/publish` | Admin | Publish ready version |
 | POST | `/documents/{id}/archive` | Admin | Archive version |
-| GET | `/admin/metrics` | Admin | Operational snapshot |
+| GET | `/admin/metrics` | Support/Admin | Operational snapshot |
+| GET | `/admin/review/escalations` | Support/Admin | 50 escalation gần nhất, không có user ID |
+| GET | `/admin/review/escalations/{id}/messages` | Support/Admin | Tối đa 100 message của escalation |
+| GET | `/admin/review/tickets` | Support/Admin | 50 ticket gần nhất |
 | POST | `/admin/retention/run` | Admin | Chạy retention với configured cutoff |
 | GET | `/health/live` | Public | Process liveness |
 | GET | `/health/ready` | Public | Database readiness |
@@ -54,12 +57,16 @@ Response shape:
   "requires_human": false,
   "human_reason": null,
   "suggested_actions": [],
-  "ticket_code": null
+  "ticket_code": null,
+  "warranty_assessment": null
 }
 ```
 
 Citation gồm `label`, `document_id`, `chunk_id`, `title`, `version`,
 `section_path`, `page` và `excerpt`. Commerce-only answer không tạo citation giả.
+Tra cứu warranty có thể trả `warranty_assessment` là `eligible`, `ineligible`
+hoặc `needs_manual_review`; đây là đánh giá tiếp nhận theo live status + policy,
+không phải phê duyệt sửa chữa, đổi máy hay bồi thường.
 
 SSE:
 

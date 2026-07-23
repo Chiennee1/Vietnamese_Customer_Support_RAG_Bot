@@ -25,10 +25,18 @@ Tạo database từ pgvector template/marketplace, đặt service name là `Post
 Default PostgreSQL template của Railway không cam kết bundle extension; migration
 đầu tiên có `CREATE EXTENSION vector` nên phải chọn image/template có pgvector.
 
-Chờ database healthy. Backend sẽ dùng reference variable:
+Chờ database healthy. Tạo một shared/sealed secret ngẫu nhiên cho runtime role.
+Backend dùng credential migration của database chỉ trong pre-deploy, còn web
+process dùng role không có DDL:
 
 ```text
-DATABASE_URL=${{Postgres.DATABASE_URL}}
+MIGRATION_DATABASE_URL=${{Postgres.DATABASE_URL}}
+RUNTIME_DB_ROLE=app_runtime
+RUNTIME_DB_PASSWORD=<sealed-random-runtime-password>
+DATABASE_URL=postgresql+asyncpg://${{RUNTIME_DB_ROLE}}:${{RUNTIME_DB_PASSWORD}}@${{Postgres.PGHOST}}:${{Postgres.PGPORT}}/${{Postgres.PGDATABASE}}
+AGENT_DB_ROLE=app_agent
+AGENT_DB_PASSWORD=<sealed-random-agent-password>
+AGENT_DATABASE_URL=postgresql+asyncpg://${{AGENT_DB_ROLE}}:${{AGENT_DB_PASSWORD}}@${{Postgres.PGHOST}}:${{Postgres.PGPORT}}/${{Postgres.PGDATABASE}}
 ```
 
 App tự chuẩn hoá `postgres://`/`postgresql://` thành SQLAlchemy asyncpg URL. Không
@@ -43,8 +51,9 @@ quan trọng, bổ sung logical `pg_dump` ngoài project theo
 1. Tạo empty service `backend`, kết nối GitHub repository/branch.
 2. Settings → Root Directory: `/backend`.
 3. Config file path: `/backend/railway.toml`.
-4. Generate Domain.
-5. Gắn volume tên `uploads`, mount `/app/uploads`.
+4. Bật GitHub Autodeploy **Wait for CI** để deployment bị skip nếu workflow fail.
+5. Generate Domain.
+6. Gắn volume tên `uploads`, mount `/app/uploads`.
 
 Đặt variables:
 
@@ -52,7 +61,13 @@ quan trọng, bổ sung logical `pg_dump` ngoài project theo
 APP_ENV=production
 APP_SECRET=<sealed-random-secret>
 JWT_SECRET=<sealed-random-secret-different-from-app-secret>
-DATABASE_URL=${{Postgres.DATABASE_URL}}
+MIGRATION_DATABASE_URL=${{Postgres.DATABASE_URL}}
+RUNTIME_DB_ROLE=app_runtime
+RUNTIME_DB_PASSWORD=<sealed-random-runtime-password>
+DATABASE_URL=postgresql+asyncpg://${{RUNTIME_DB_ROLE}}:${{RUNTIME_DB_PASSWORD}}@${{Postgres.PGHOST}}:${{Postgres.PGPORT}}/${{Postgres.PGDATABASE}}
+AGENT_DB_ROLE=app_agent
+AGENT_DB_PASSWORD=<sealed-random-agent-password>
+AGENT_DATABASE_URL=postgresql+asyncpg://${{AGENT_DB_ROLE}}:${{AGENT_DB_PASSWORD}}@${{Postgres.PGHOST}}:${{Postgres.PGPORT}}/${{Postgres.PGDATABASE}}
 OPENAI_API_KEY=<sealed-provider-key>
 LLM_PROVIDER=openai
 LLM_MODEL=gpt-5-mini
@@ -74,7 +89,9 @@ Kiểm tra log startup để chắc process app không chạy root.
 `backend/railway.toml` đảm nhiệm:
 
 - Dockerfile build;
-- Alembic `upgrade head` trong pre-deploy container;
+- Alembic `upgrade head`, rồi provision idempotent role web runtime và agent
+  read-only trong pre-deploy;
+- entrypoint loại migration/provision secret khỏi môi trường của Uvicorn;
 - readiness `/api/v1/health/ready`;
 - timeout 300 giây;
 - restart on failure, tối đa 5 lần;
@@ -89,15 +106,16 @@ là synthetic.
 1. Tạo service `frontend`, kết nối cùng repo/branch.
 2. Root Directory: `/frontend`.
 3. Config file path: `/frontend/railway.toml`.
-4. Đặt build variable:
+4. Bật GitHub Autodeploy **Wait for CI**.
+5. Đặt build variable:
 
 ```text
 VITE_API_BASE_URL=https://<backend-domain>/api/v1
 ```
 
-5. Deploy, generate frontend domain.
-6. Cập nhật backend `CORS_ORIGINS` đúng origin frontend, không có slash cuối.
-7. Redeploy backend và frontend nếu domain/API variable thay đổi.
+6. Deploy, generate frontend domain.
+7. Cập nhật backend `CORS_ORIGINS` đúng origin frontend, không có slash cuối.
+8. Redeploy backend và frontend nếu domain/API variable thay đổi.
 
 Nginx template lắng nghe `$PORT` do Railway inject và trả security headers/CSP.
 Không đặt secret trong `VITE_*`; giá trị này xuất hiện công khai trong JS bundle.
@@ -148,7 +166,10 @@ Kiểm tra thủ công:
 - policy answer có citation;
 - prompt injection không bypass;
 - complaint chỉ tạo ticket sau xác nhận;
+- support/admin đọc được `/admin/operations`, customer nhận 403;
 - admin upload/publish/archive;
+- `app_runtime` đọc/ghi workflow web nhưng không có DDL; `app_agent` chỉ SELECT,
+  không UPDATE/DELETE/DDL; cả hai có `rolsuper=false`;
 - logs không có token/email/body;
 - `/docs` và `/openapi.json` trả 404 ở production.
 
@@ -185,6 +206,7 @@ Tham khảo Railway chính thức:
 - <https://docs.railway.com/config-as-code/reference>
 - <https://docs.railway.com/deployments/pre-deploy-command>
 - <https://docs.railway.com/deployments/healthchecks>
+- <https://docs.railway.com/deployments/github-autodeploys>
 - <https://docs.railway.com/volumes>
 - <https://docs.railway.com/volumes/backups>
 - <https://docs.railway.com/databases/postgresql>

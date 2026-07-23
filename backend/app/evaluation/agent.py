@@ -45,9 +45,7 @@ def load_agent_gold_cases(path: Path) -> list[AgentGoldCase]:
                 critical=bool(payload.get("critical", False)),
             )
         except (KeyError, TypeError, ValueError, json.JSONDecodeError) as error:
-            raise ValueError(
-                f"invalid agent gold case at line {line_number}"
-            ) from error
+            raise ValueError(f"invalid agent gold case at line {line_number}") from error
         if case.id in seen_ids:
             raise ValueError(f"duplicate agent gold case id: {case.id}")
         if not case.message.strip():

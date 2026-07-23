@@ -45,9 +45,7 @@ class SqlAlchemyRetrievalRepository:
         limit: int,
         category: str | None,
     ) -> list[RetrievalHit]:
-        distance = KnowledgeChunk.embedding.cosine_distance(query_vector).label(
-            "distance"
-        )
+        distance = KnowledgeChunk.embedding.cosine_distance(query_vector).label("distance")
         statement = (
             select(KnowledgeChunk, KnowledgeDocument, distance)
             .join(

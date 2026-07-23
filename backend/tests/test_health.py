@@ -74,6 +74,13 @@ def test_production_disables_openapi_and_enables_hsts() -> None:
         app_env="production",
         app_secret=SecretStr("production-app-secret"),
         jwt_secret=SecretStr("production-jwt-secret"),
+        runtime_db_password=SecretStr("production-runtime-password"),
+        agent_db_password=SecretStr("production-agent-password"),
+        database_url=SecretStr("postgresql+asyncpg://app_runtime:runtime@db:5432/support_rag"),
+        agent_database_url=SecretStr("postgresql+asyncpg://app_agent:agent@db:5432/support_rag"),
+        migration_database_url=SecretStr(
+            "postgresql+asyncpg://migrator:migration@db:5432/support_rag"
+        ),
     )
     client = TestClient(
         create_app(
@@ -86,9 +93,7 @@ def test_production_disables_openapi_and_enables_hsts() -> None:
     openapi = client.get("/openapi.json")
 
     assert live.status_code == 200
-    assert live.headers["strict-transport-security"] == (
-        "max-age=31536000; includeSubDomains"
-    )
+    assert live.headers["strict-transport-security"] == ("max-age=31536000; includeSubDomains")
     assert openapi.status_code == 404
 
 

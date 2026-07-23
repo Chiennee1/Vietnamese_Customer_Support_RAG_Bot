@@ -33,6 +33,7 @@ class ProductSearchTool:
             brand=payload.brand,
             max_price=payload.max_price,
             storage_gb=payload.storage_gb,
+            color=payload.color,
             limit=payload.limit,
         )
         if not items:
@@ -41,9 +42,7 @@ class ProductSearchTool:
                 message="Không tìm thấy sản phẩm trong dữ liệu hiện tại.",
                 status_code=404,
             )
-        return ProductSearchOutput(
-            items=[ProductItem.model_validate(item) for item in items]
-        )
+        return ProductSearchOutput(items=[ProductItem.model_validate(item) for item in items])
 
 
 class OrderStatusTool:

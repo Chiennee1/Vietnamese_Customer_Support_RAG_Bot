@@ -59,9 +59,7 @@ class SlidingWindowRateLimiter:
     def _prune_or_evict(self, current: float) -> None:
         boundary = current - self.window_seconds
         expired_keys = [
-            key
-            for key, bucket in self.events.items()
-            if not bucket or bucket[-1] <= boundary
+            key for key, bucket in self.events.items() if not bucket or bucket[-1] <= boundary
         ]
         for key in expired_keys:
             self.events.pop(key, None)

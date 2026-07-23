@@ -23,9 +23,7 @@ class TicketCreationTool:
         context: RuntimeContext,
     ) -> TicketCreationOutput:
         idempotency_source = context.message_id or context.request_id
-        idempotency_key = sha256(
-            f"{context.user_id}:{idempotency_source}".encode()
-        ).hexdigest()
+        idempotency_key = sha256(f"{context.user_id}:{idempotency_source}".encode()).hexdigest()
         return await self.tickets.create(
             CreateTicketCommand(
                 category=payload.category,

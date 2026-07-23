@@ -36,6 +36,7 @@ class FakeProducts:
         brand: str | None,
         max_price: Decimal | None,
         storage_gb: int | None,
+        color: str | None,
         limit: int,
     ) -> list[ProductLookupResult]:
         return [
@@ -125,9 +126,7 @@ def test_tool_schemas_forbid_user_id_sql_and_unknown_fields() -> None:
     assert "user_id" not in schema_text
     assert "sql" not in schema_text
     with pytest.raises(ValidationError):
-        OrderStatusInput.model_validate(
-            {"order_code": "DH2026000001", "user_id": str(uuid4())}
-        )
+        OrderStatusInput.model_validate({"order_code": "DH2026000001", "user_id": str(uuid4())})
 
 
 async def test_order_tool_binds_owner_from_runtime_context() -> None:

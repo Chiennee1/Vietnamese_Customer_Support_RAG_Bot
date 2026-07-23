@@ -49,6 +49,7 @@ class ChatResponse(BaseModel):
     human_reason: str | None
     suggested_actions: list[str]
     ticket_code: str | None
+    warranty_assessment: str | None
 
     @classmethod
     def from_result(cls, result: ChatResult) -> "ChatResponse":
@@ -58,14 +59,12 @@ class ChatResponse(BaseModel):
             message_id=message.id,
             answer=message.content,
             intent=message.intent or "unknown",
-            citations=[
-                CitationResponse.model_validate(citation)
-                for citation in message.citations
-            ],
+            citations=[CitationResponse.model_validate(citation) for citation in message.citations],
             requires_human=message.requires_human,
             human_reason=message.human_reason,
             suggested_actions=message.suggested_actions,
             ticket_code=message.ticket_code,
+            warranty_assessment=message.warranty_assessment,
         )
 
 
@@ -79,6 +78,7 @@ class MessageResponse(BaseModel):
     human_reason: str | None
     suggested_actions: list[str]
     ticket_code: str | None
+    warranty_assessment: str | None
     created_at: datetime
 
     @classmethod
@@ -88,14 +88,12 @@ class MessageResponse(BaseModel):
             role=record.role,
             content=record.content,
             intent=record.intent,
-            citations=[
-                CitationResponse.model_validate(citation)
-                for citation in record.citations
-            ],
+            citations=[CitationResponse.model_validate(citation) for citation in record.citations],
             requires_human=record.requires_human,
             human_reason=record.human_reason,
             suggested_actions=record.suggested_actions,
             ticket_code=record.ticket_code,
+            warranty_assessment=record.warranty_assessment,
             created_at=record.created_at,
         )
 
@@ -129,10 +127,7 @@ class ConversationResponse(ConversationSummaryResponse):
             title=detail.conversation.title,
             created_at=detail.conversation.created_at,
             updated_at=detail.conversation.updated_at,
-            messages=[
-                MessageResponse.from_record(message)
-                for message in detail.messages
-            ],
+            messages=[MessageResponse.from_record(message) for message in detail.messages],
         )
 
 

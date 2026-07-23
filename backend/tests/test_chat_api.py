@@ -3,6 +3,7 @@ from dataclasses import replace
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.ai.model import ConversationTurn
@@ -11,7 +12,8 @@ from app.ai.orchestrator import (
     ToolExecutionTrace,
 )
 from app.ai.tools.contracts import RuntimeContext
-from app.db.models.conversation import MessageRole
+from app.core.errors import AppError
+from app.db.models.conversation import MessageRole, ToolExecutionStatus
 from app.db.models.ticket import FeedbackRating
 from app.db.models.user import User, UserRole
 from app.main import create_app
@@ -81,11 +83,9 @@ class MemoryConversations:
         user_id: UUID,
         limit: int = 50,
     ) -> list[ConversationRecord]:
-        return [
-            record
-            for record in self.conversations.values()
-            if record.user_id == user_id
-        ][:limit]
+        return [record for record in self.conversations.values() if record.user_id == user_id][
+            :limit
+        ]
 
     async def list_messages(
         self,
@@ -114,6 +114,7 @@ class MemoryConversations:
             human_reason=record.human_reason,
             suggested_actions=record.suggested_actions or [],
             ticket_code=record.ticket_code,
+            warranty_assessment=record.warranty_assessment,
             created_at=now,
         )
         self.messages[record.conversation_id].append(message)
@@ -200,11 +201,57 @@ class FakeOrchestrator:
             human_reason=None,
             suggested_actions=(),
             tool_names=("get_order_status",),
-            tool_executions=(
-                ToolExecutionTrace(name="get_order_status", duration_ms=12),
-            ),
+            tool_executions=(ToolExecutionTrace(name="get_order_status", duration_ms=12),),
             model_used=True,
         )
+
+
+class FailingOrchestrator:
+    async def respond(
+        self,
+        message: str,
+        *,
+        context: RuntimeContext,
+        history: tuple[ConversationTurn, ...] = (),
+    ) -> OrchestratorResult:
+        del message, context, history
+        raise AppError(
+            code="TOOL_TIMEOUT",
+            message="Dịch vụ tra cứu phản hồi quá thời gian.",
+            status_code=504,
+            internal_context={
+                "tool_executions": [
+                    {
+                        "name": "get_order_status",
+                        "duration_ms": 10,
+                        "status": "timeout",
+                        "error_code": "TOOL_TIMEOUT",
+                    }
+                ]
+            },
+        )
+
+
+class RequestTimeoutOrchestrator:
+    async def respond(
+        self,
+        message: str,
+        *,
+        context: RuntimeContext,
+        history: tuple[ConversationTurn, ...] = (),
+    ) -> OrchestratorResult:
+        del message, history
+        assert context.tool_trace_sink is not None
+        context.tool_trace_sink.append(
+            {
+                "name": "get_order_status",
+                "duration_ms": 4,
+                "status": "success",
+                "error_code": None,
+            }
+        )
+        await asyncio.sleep(0.05)
+        raise AssertionError("request timeout should cancel orchestration")
 
 
 def make_client() -> tuple[TestClient, AuthService, MemoryConversations, FakeOrchestrator]:
@@ -379,3 +426,56 @@ def test_chat_rejects_blank_and_authorization_fields() -> None:
 
     assert blank.status_code == 422
     assert forged_identity.status_code == 422
+
+
+async def test_failed_tool_execution_is_persisted_without_exposing_context() -> None:
+    store = MemoryConversations()
+    chat = ChatService(
+        conversations=store,
+        orchestrator=FailingOrchestrator(),
+        model_name="test-model",
+    )
+
+    with pytest.raises(AppError) as captured:
+        await chat.send_message(
+            user_id=uuid4(),
+            user_role=UserRole.CUSTOMER,
+            request_id="req-failure",
+            message="Đơn DH2026000001 tới đâu?",
+            conversation_id=None,
+        )
+
+    assert captured.value.code == "TOOL_TIMEOUT"
+    assert len(store.tool_executions) == 1
+    execution = store.tool_executions[0]
+    assert execution.status == ToolExecutionStatus.TIMEOUT
+    assert execution.error_code == "TOOL_TIMEOUT"
+    assert execution.message_id in {
+        message.id
+        for messages in store.messages.values()
+        for message in messages
+        if message.role == MessageRole.USER
+    }
+
+
+async def test_request_timeout_persists_tools_completed_before_cancellation() -> None:
+    store = MemoryConversations()
+    chat = ChatService(
+        conversations=store,
+        orchestrator=RequestTimeoutOrchestrator(),
+        model_name="test-model",
+        request_timeout_seconds=0.01,
+    )
+
+    with pytest.raises(AppError) as captured:
+        await chat.send_message(
+            user_id=uuid4(),
+            user_role=UserRole.CUSTOMER,
+            request_id="req-timeout",
+            message="Đơn DH2026000001 tới đâu?",
+            conversation_id=None,
+        )
+
+    assert captured.value.code == "REQUEST_TIMEOUT"
+    assert store.tool_executions[0].status == ToolExecutionStatus.SUCCESS
+    assert store.tool_executions[0].tool_name == "get_order_status"

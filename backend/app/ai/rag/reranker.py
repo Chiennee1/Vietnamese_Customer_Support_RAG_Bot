@@ -26,11 +26,8 @@ class WeightedOverlapReranker:
         query_terms = {term.casefold() for term in WORD_PATTERN.findall(query)}
 
         def score(candidate: FusedEvidence) -> float:
-            content_terms = {
-                term.casefold() for term in WORD_PATTERN.findall(candidate.content)
-            }
+            content_terms = {term.casefold() for term in WORD_PATTERN.findall(candidate.content)}
             overlap = len(query_terms & content_terms) / max(1, len(query_terms))
             return candidate.fused_score + self.overlap_weight * overlap
 
         return sorted(candidates, key=score, reverse=True)
-

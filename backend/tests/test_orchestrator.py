@@ -15,10 +15,14 @@ from app.ai.orchestrator import (
 from app.ai.router import SupportRouter
 from app.ai.tools.contracts import (
     CitationOutput,
+    KnowledgeSearchInput,
     KnowledgeSearchOutput,
     OrderLine,
     OrderStatusOutput,
+    ProductSearchInput,
+    ProductSearchOutput,
     RuntimeContext,
+    WarrantyAssessment,
     WarrantyStatusOutput,
 )
 from app.core.errors import AppError
@@ -36,7 +40,12 @@ class FakeModel:
     async def generate(self, request: GenerationRequest) -> str:
         self.requests.append(request)
         if request.intent == "warranty_status":
-            return "Bảo hành đang còn hiệu lực theo dữ liệu hệ thống [KB-1]."
+            return (
+                "Theo dữ liệu hệ thống, bảo hành đang còn hiệu lực. "
+                "Thiết bị còn thời hạn sẽ được tiếp nhận kiểm tra [KB-1]."
+            )
+        if request.citations:
+            return "Thiết bị còn thời hạn sẽ được tiếp nhận kiểm tra [KB-1]."
         return "Kết quả đã được xác nhận từ dữ liệu hệ thống hiện tại."
 
 
@@ -54,6 +63,12 @@ class SlowTool:
         del payload, context
         await asyncio.sleep(0.05)
         raise AssertionError("timeout should cancel this execution")
+
+
+class InvalidTool:
+    async def execute(self, payload: object, context: RuntimeContext) -> object:
+        del payload, context
+        return {"unexpected": "shape"}
 
 
 class FakeOrders:
@@ -86,6 +101,21 @@ class FakeOrders:
         )
 
 
+class FakeProducts:
+    def __init__(self) -> None:
+        self.payloads: list[ProductSearchInput] = []
+
+    async def execute(
+        self,
+        payload: object,
+        context: RuntimeContext,
+    ) -> ProductSearchOutput:
+        del context
+        assert isinstance(payload, ProductSearchInput)
+        self.payloads.append(payload)
+        return ProductSearchOutput(items=[])
+
+
 class FakeWarranties:
     def __init__(self) -> None:
         self.calls = 0
@@ -109,6 +139,7 @@ class FakeWarranties:
 class FakeKnowledge:
     def __init__(self) -> None:
         self.calls = 0
+        self.payloads: list[object] = []
 
     async def execute(
         self,
@@ -116,8 +147,12 @@ class FakeKnowledge:
         context: RuntimeContext,
     ) -> KnowledgeSearchOutput:
         self.calls += 1
+        self.payloads.append(payload)
         return KnowledgeSearchOutput(
-            evidence=["Thiết bị còn thời hạn sẽ được tiếp nhận kiểm tra."],
+            evidence=[
+                "Thiết bị được tiếp nhận kiểm tra khi serial trùng dữ liệu, "
+                "còn thời hạn và không có dấu hiệu loại trừ."
+            ],
             citations=[
                 CitationOutput(
                     label="KB-1",
@@ -127,7 +162,10 @@ class FakeKnowledge:
                     version="1.0",
                     section_path=["Điều kiện"],
                     page=4,
-                    excerpt="Thiết bị còn thời hạn sẽ được tiếp nhận kiểm tra.",
+                    excerpt=(
+                        "Thiết bị được tiếp nhận kiểm tra khi serial trùng dữ liệu, "
+                        "còn thời hạn và không có dấu hiệu loại trừ."
+                    ),
                 )
             ],
             insufficient=False,
@@ -143,8 +181,22 @@ class ConflictingKnowledge(FakeKnowledge):
         context: RuntimeContext,
     ) -> KnowledgeSearchOutput:
         result = await super().execute(payload, context)
+        return result.model_copy(update={"conflict": True, "requires_human": True})
+
+
+class InsufficientKnowledge(FakeKnowledge):
+    async def execute(
+        self,
+        payload: object,
+        context: RuntimeContext,
+    ) -> KnowledgeSearchOutput:
+        result = await super().execute(payload, context)
         return result.model_copy(
-            update={"conflict": True, "requires_human": True}
+            update={
+                "evidence": [],
+                "citations": [],
+                "insufficient": True,
+            }
         )
 
 
@@ -175,6 +227,7 @@ def make_context() -> RuntimeContext:
 
 def make_orchestrator(
     *,
+    products: ToolExecutor | None = None,
     orders: ToolExecutor | None = None,
     warranties: ToolExecutor | None = None,
     knowledge: ToolExecutor | None = None,
@@ -185,7 +238,7 @@ def make_orchestrator(
     orchestrator = SupportOrchestrator(
         router=SupportRouter(),
         tools=OrchestratorTools(
-            products=NeverCalledTool(),
+            products=products or NeverCalledTool(),
             orders=orders or NeverCalledTool(),
             warranties=warranties or NeverCalledTool(),
             knowledge=knowledge or NeverCalledTool(),
@@ -214,6 +267,45 @@ async def test_order_flow_uses_runtime_identity_and_one_tool() -> None:
     assert len(model.requests) == 1
 
 
+async def test_order_return_question_combines_live_order_and_policy() -> None:
+    orders = FakeOrders()
+    knowledge = FakeKnowledge()
+    orchestrator, model = make_orchestrator(
+        orders=orders,
+        knowledge=knowledge,
+    )
+
+    result = await orchestrator.respond(
+        "Đơn DH2026000001 có đủ điều kiện đổi trả không?",
+        context=make_context(),
+    )
+
+    assert result.tool_names == ("get_order_status", "search_knowledge_base")
+    assert knowledge.calls == 1
+    assert isinstance(knowledge.payloads[0], KnowledgeSearchInput)
+    assert knowledge.payloads[0].category == "returns"
+    assert model.requests[0].trusted_context["current_order"]["order_code"] == ("DH2026000001")
+    assert model.requests[0].trusted_context["policy_evidence"]
+    assert result.citations[0].label == "KB-1"
+
+
+async def test_product_query_preserves_model_and_extracts_filters() -> None:
+    products = FakeProducts()
+    orchestrator, _ = make_orchestrator(products=products)
+
+    await orchestrator.respond(
+        "Samsung Demo Phone 2 bản 256 GB dưới 20 triệu màu đen còn hàng?",
+        context=make_context(),
+    )
+
+    payload = products.payloads[0]
+    assert "Samsung Demo Phone 2" in payload.query
+    assert payload.brand == "Samsung"
+    assert payload.storage_gb == 256
+    assert payload.max_price == Decimal("20000000")
+    assert payload.color == "Đen"
+
+
 async def test_customer_specific_warranty_combines_live_and_policy_tools() -> None:
     warranties = FakeWarranties()
     knowledge = FakeKnowledge()
@@ -231,6 +323,26 @@ async def test_customer_specific_warranty_combines_live_and_policy_tools() -> No
     assert knowledge.calls == 1
     assert result.tool_names == ("check_warranty", "search_knowledge_base")
     assert result.citations[0].label == "KB-1"
+    assert result.warranty_assessment == WarrantyAssessment.ELIGIBLE
+
+
+async def test_warranty_damage_description_requires_manual_review() -> None:
+    knowledge = FakeKnowledge()
+    orchestrator, model = make_orchestrator(
+        warranties=FakeWarranties(),
+        knowledge=knowledge,
+    )
+    message = "Serial SN2600000001 còn bảo hành nhưng máy bị rơi vỡ?"
+
+    result = await orchestrator.respond(message, context=make_context())
+
+    assert result.requires_human
+    assert result.human_reason == "WARRANTY_MANUAL_REVIEW"
+    assert message in str(knowledge.payloads[0])
+    assert (
+        model.requests[0].trusted_context["warranty_assessment"]["outcome"] == "needs_manual_review"
+    )
+    assert result.warranty_assessment == WarrantyAssessment.NEEDS_MANUAL_REVIEW
 
 
 async def test_warranty_conflicting_policy_requires_human_review() -> None:
@@ -246,8 +358,27 @@ async def test_warranty_conflicting_policy_requires_human_review() -> None:
 
     assert result.requires_human
     assert result.human_reason == "KNOWLEDGE_CONFLICT"
+    assert result.warranty_assessment == WarrantyAssessment.NEEDS_MANUAL_REVIEW
     assert result.tool_names == ("check_warranty", "search_knowledge_base")
     assert result.citations[0].label == "KB-1"
+    assert not model.requests
+
+
+async def test_warranty_insufficient_policy_has_explicit_manual_review_outcome() -> None:
+    orchestrator, model = make_orchestrator(
+        warranties=FakeWarranties(),
+        knowledge=InsufficientKnowledge(),
+    )
+
+    result = await orchestrator.respond(
+        "Serial SN2600000001 còn bảo hành không?",
+        context=make_context(),
+    )
+
+    assert result.requires_human
+    assert result.human_reason == "KNOWLEDGE_INSUFFICIENT"
+    assert result.warranty_assessment == WarrantyAssessment.NEEDS_MANUAL_REVIEW
+    assert not result.citations
     assert not model.requests
 
 
@@ -341,3 +472,21 @@ async def test_tool_execution_has_a_hard_timeout() -> None:
         )
 
     assert captured.value.code == "TOOL_TIMEOUT"
+    traces = captured.value.internal_context["tool_executions"]
+    assert traces[0]["status"] == "timeout"
+    assert traces[0]["error_code"] == "TOOL_TIMEOUT"
+
+
+async def test_invalid_tool_result_keeps_completed_execution_trace() -> None:
+    orchestrator, _ = make_orchestrator(products=InvalidTool())
+
+    with pytest.raises(AppError) as captured:
+        await orchestrator.respond(
+            "Điện thoại Samsung còn hàng không?",
+            context=make_context(),
+        )
+
+    assert captured.value.code == "INVALID_TOOL_RESULT"
+    traces = captured.value.internal_context["tool_executions"]
+    assert traces[0]["name"] == "search_products"
+    assert traces[0]["status"] == "success"

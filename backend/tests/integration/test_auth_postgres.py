@@ -50,4 +50,3 @@ async def test_auth_round_trip_against_postgres() -> None:
             await session.execute(delete(User).where(User.email == email))
             await session.commit()
         await database.dispose()
-

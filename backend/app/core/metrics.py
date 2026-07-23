@@ -106,9 +106,7 @@ class MetricsRegistry:
             "feedback": {
                 "ratings": dict(sorted(self.feedback.items())),
                 "positive_rate": (
-                    self.feedback["positive"] / total_feedback
-                    if total_feedback
-                    else 0.0
+                    self.feedback["positive"] / total_feedback if total_feedback else 0.0
                 ),
             },
         }

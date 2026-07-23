@@ -1,5 +1,5 @@
 {
-  "dataset_cases": 464,
+  "dataset_cases": 509,
   "rag_offline_lexical": {
     "cases": 145,
     "answerable_cases": 125,
@@ -8,7 +8,7 @@
     "mrr": 0.8893333333333333
   },
   "agent": {
-    "cases": 199,
+    "cases": 244,
     "intent_accuracy": 1.0,
     "tool_accuracy": 1.0,
     "critical_bypasses": 0

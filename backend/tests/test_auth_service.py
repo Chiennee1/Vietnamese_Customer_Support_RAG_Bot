@@ -90,4 +90,3 @@ async def test_login_does_not_reveal_whether_email_exists(auth_service: AuthServ
     assert missing.value.code == "INVALID_CREDENTIALS"
     assert wrong_password.value.code == "INVALID_CREDENTIALS"
     assert missing.value.message == wrong_password.value.message
-

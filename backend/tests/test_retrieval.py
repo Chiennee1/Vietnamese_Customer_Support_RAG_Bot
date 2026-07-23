@@ -186,14 +186,14 @@ def test_citation_verifier_rejects_unknown_or_missing_labels() -> None:
             chunk_id=uuid4(),
             title="FAQ",
             version="1.0",
-            content="Cửa hàng giao hàng theo chính sách đã công bố.",
+            content="Thời gian dự kiến để nhận kiện hàng là 2 ngày.",
             score=1.0,
         ),
         label="KB-1",
     )
 
     assert verifier.verify(
-        "Thông tin được xác nhận trong chính sách [KB-1].",
+        "Thời gian dự kiến để nhận kiện hàng là 2 ngày [KB-1].",
         [citation],
         citations_required=True,
     ).valid

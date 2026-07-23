@@ -34,15 +34,15 @@ rule/state rõ ràng. LLM không phải nơi thực thi authorization hoặc sid
 
 ### Honest evaluation
 
-464 gold cases là regression deterministic. Baseline 0,976 HitRate@5 và 1,000
+509 gold cases là regression deterministic. Baseline 0,976 HitRate@5 và 1,000
 tool accuracy không được quảng bá thành end-to-end model faithfulness. Load smoke
-84 ms p95 là greeting không gọi model.
+136 ms p95 là greeting không gọi model.
 
 ## Kết quả kiểm chứng
 
-- 68 unit/API + 7 PostgreSQL integration tests.
+- 117 unit/API + 8 PostgreSQL integration tests.
 - Cross-user order/warranty/conversation/feedback bị từ chối ở repository/API.
-- 145 RAG, 199 agent, 120 security cases; 0 critical bypass.
+- 145 RAG, 244 agent, 120 security cases; 0 critical bypass.
 - Alembic rollback/upgrade và schema drift check.
 - Backend/frontend production container build và Docker smoke.
 - Security headers, log redaction, rate limit, timeout và 30-day retention.
@@ -83,7 +83,7 @@ tool accuracy không được quảng bá thành end-to-end model faithfulness. 
 
 > Designed backend-enforced source-of-truth and ownership boundaries, deterministic
 > tool routing, prompt-injection defenses and human escalation; validated them on
-> 464 synthetic RAG/agent/security cases with zero critical routing bypasses.
+> 509 synthetic RAG/agent/security cases with zero critical routing bypasses.
 
 > Implemented idempotent document ingestion, hybrid retrieval, validated citations,
 > Alembic migrations, structured privacy-safe observability, Docker/Railway

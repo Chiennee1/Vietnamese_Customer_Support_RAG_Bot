@@ -11,4 +11,3 @@ def import_all_models() -> None:
 
 
 import_all_models()
-

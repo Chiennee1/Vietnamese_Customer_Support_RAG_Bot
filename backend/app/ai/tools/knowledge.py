@@ -25,12 +25,8 @@ class KnowledgeBaseTool:
         )
         return KnowledgeSearchOutput(
             evidence=[item.content for item in result.evidence],
-            citations=[
-                CitationOutput.model_validate(citation)
-                for citation in result.citations
-            ],
+            citations=[CitationOutput.model_validate(citation) for citation in result.citations],
             insufficient=result.insufficient,
             conflict=result.conflict,
             requires_human=result.requires_human,
         )
-

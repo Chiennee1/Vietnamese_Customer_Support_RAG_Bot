@@ -39,6 +39,7 @@ class MessageCreateRecord:
     human_reason: str | None = None
     suggested_actions: list[str] | None = None
     ticket_code: str | None = None
+    warranty_assessment: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -56,6 +57,7 @@ class MessageRecord:
     human_reason: str | None
     suggested_actions: list[str]
     ticket_code: str | None
+    warranty_assessment: str | None
     created_at: datetime
 
 
@@ -79,6 +81,15 @@ class FeedbackRecord:
     comment: str | None
     created_at: datetime
     updated_at: datetime
+
+
+@dataclass(frozen=True, slots=True)
+class EscalationReviewRecord:
+    conversation_id: UUID
+    title: str | None
+    human_reason: str | None
+    ticket_code: str | None
+    raised_at: datetime
 
 
 class ConversationRepository:
@@ -154,10 +165,7 @@ class ConversationRepository:
                     .limit(limit)
                 )
             ).all()
-            return [
-                self._message_record(row)
-                for row in reversed(newest)
-            ]
+            return [self._message_record(row) for row in reversed(newest)]
 
     async def add_message(self, record: MessageCreateRecord) -> MessageRecord:
         row = Message(
@@ -174,6 +182,7 @@ class ConversationRepository:
             human_reason=record.human_reason,
             suggested_actions=record.suggested_actions or [],
             ticket_code=record.ticket_code,
+            warranty_assessment=record.warranty_assessment,
         )
         async with self.sessions() as session:
             session.add(row)
@@ -247,6 +256,62 @@ class ConversationRepository:
                 await session.delete(row)
             await session.commit()
             return len(rows)
+
+    async def list_escalations(
+        self,
+        *,
+        limit: int = 50,
+    ) -> list[EscalationReviewRecord]:
+        statement = (
+            select(Conversation, Message)
+            .join(Message, Message.conversation_id == Conversation.id)
+            .where(
+                Message.role == MessageRole.ASSISTANT,
+                Message.requires_human.is_(True),
+            )
+            .order_by(Message.created_at.desc(), Message.id.desc())
+            .limit(limit)
+        )
+        async with self.sessions() as session:
+            rows = (await session.execute(statement)).all()
+        return [
+            EscalationReviewRecord(
+                conversation_id=conversation.id,
+                title=conversation.title,
+                human_reason=message.human_reason,
+                ticket_code=message.ticket_code,
+                raised_at=message.created_at,
+            )
+            for conversation, message in rows
+        ]
+
+    async def get_escalation_messages(
+        self,
+        conversation_id: UUID,
+        *,
+        limit: int = 100,
+    ) -> list[MessageRecord] | None:
+        async with self.sessions() as session:
+            escalation = await session.scalar(
+                select(Message.id)
+                .where(
+                    Message.conversation_id == conversation_id,
+                    Message.role == MessageRole.ASSISTANT,
+                    Message.requires_human.is_(True),
+                )
+                .limit(1)
+            )
+            if escalation is None:
+                return None
+            rows = (
+                await session.scalars(
+                    select(Message)
+                    .where(Message.conversation_id == conversation_id)
+                    .order_by(Message.created_at.asc(), Message.id.asc())
+                    .limit(limit)
+                )
+            ).all()
+        return [self._message_record(row) for row in rows]
 
     async def upsert_feedback(
         self,
@@ -324,5 +389,6 @@ class ConversationRepository:
             human_reason=row.human_reason,
             suggested_actions=row.suggested_actions,
             ticket_code=row.ticket_code,
+            warranty_assessment=row.warranty_assessment,
             created_at=row.created_at,
         )

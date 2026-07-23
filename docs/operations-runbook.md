@@ -95,7 +95,7 @@ Triệu chứng: `REQUEST_TIMEOUT`, provider error, chat error tăng.
 1. Lưu case đã redacted vào `security_eval.jsonl`.
 2. Xác nhận tool trace và ownership; nếu có data exposure, theo data incident.
 3. Sửa boundary/backend guard trước, prompt chỉ là defense bổ sung.
-4. Rerun toàn bộ 464+ cases; gate critical bypass phải bằng 0.
+4. Rerun toàn bộ 509+ cases; gate critical bypass phải bằng 0.
 5. Deploy theo checklist và theo dõi intent/tool distribution.
 
 ## Retention

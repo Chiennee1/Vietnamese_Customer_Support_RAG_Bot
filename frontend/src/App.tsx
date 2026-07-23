@@ -2,6 +2,7 @@ import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
 import { useAuth } from "./auth-context";
 import { AdminKnowledgePage } from "./pages/AdminKnowledgePage";
+import { AdminOperationsPage } from "./pages/AdminOperationsPage";
 import { ChatPage } from "./pages/ChatPage";
 import { LoginPage } from "./pages/LoginPage";
 import type { UserRole } from "./types";
@@ -11,7 +12,7 @@ function ProtectedRoute({
   role,
 }: {
   children: React.ReactNode;
-  role?: UserRole;
+  role?: UserRole | UserRole[];
 }) {
   const { token, user, ready } = useAuth();
   const location = useLocation();
@@ -27,7 +28,10 @@ function ProtectedRoute({
   if (!token || !user) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
-  if (role && user.role !== role) {
+  if (
+    role &&
+    !(Array.isArray(role) ? role.includes(user.role) : user.role === role)
+  ) {
     return <Navigate to="/chat" replace />;
   }
   return children;
@@ -50,6 +54,14 @@ export function App() {
         element={
           <ProtectedRoute role="admin">
             <AdminKnowledgePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/operations"
+        element={
+          <ProtectedRoute role={["support", "admin"]}>
+            <AdminOperationsPage />
           </ProtectedRoute>
         }
       />

@@ -103,97 +103,142 @@
 {"id":"agent-103","message":"Cửa hàng hỗ trợ phương thức thanh toán nào? Cho tôi kết quả có căn cứ.","expected_intent":"payment_policy","expected_tools":["search_knowledge_base"],"critical":false}
 {"id":"agent-104","message":"Cửa hàng hỗ trợ phương thức thanh toán nào? Đây là yêu cầu hỗ trợ khách hàng.","expected_intent":"payment_policy","expected_tools":["search_knowledge_base"],"critical":false}
 {"id":"agent-105","message":"Cửa hàng hỗ trợ phương thức thanh toán nào? Tôi đang cần được hỗ trợ.","expected_intent":"payment_policy","expected_tools":["search_knowledge_base"],"critical":false}
-{"id":"agent-106","message":"Mã DH2026000001 hiện đang ở trạng thái nào?","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
-{"id":"agent-107","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Bạn kiểm tra giúp tôi.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
-{"id":"agent-108","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Tôi cần câu trả lời ngắn gọn.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
-{"id":"agent-109","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Vui lòng xác minh đúng nguồn.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
-{"id":"agent-110","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Đây là câu hỏi cho bản demo.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
-{"id":"agent-111","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Hãy cho tôi biết thông tin hiện tại.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
-{"id":"agent-112","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Tôi đang dùng tài khoản của mình.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
-{"id":"agent-113","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Xin trả lời bằng tiếng Việt.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
-{"id":"agent-114","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Tôi muốn biết bước tiếp theo.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
-{"id":"agent-115","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Vui lòng không suy đoán.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
-{"id":"agent-116","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Hãy kiểm tra cẩn thận.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
-{"id":"agent-117","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Tôi cần thông tin chính xác.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
-{"id":"agent-118","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Cho tôi kết quả có căn cứ.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
-{"id":"agent-119","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Đây là yêu cầu hỗ trợ khách hàng.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
-{"id":"agent-120","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Tôi đang cần được hỗ trợ.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
-{"id":"agent-121","message":"Serial SN2600000001 còn bảo hành không?","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
-{"id":"agent-122","message":"Serial SN2600000001 còn bảo hành không? Bạn kiểm tra giúp tôi.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
-{"id":"agent-123","message":"Serial SN2600000001 còn bảo hành không? Tôi cần câu trả lời ngắn gọn.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
-{"id":"agent-124","message":"Serial SN2600000001 còn bảo hành không? Vui lòng xác minh đúng nguồn.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
-{"id":"agent-125","message":"Serial SN2600000001 còn bảo hành không? Đây là câu hỏi cho bản demo.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
-{"id":"agent-126","message":"Serial SN2600000001 còn bảo hành không? Hãy cho tôi biết thông tin hiện tại.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
-{"id":"agent-127","message":"Serial SN2600000001 còn bảo hành không? Tôi đang dùng tài khoản của mình.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
-{"id":"agent-128","message":"Serial SN2600000001 còn bảo hành không? Xin trả lời bằng tiếng Việt.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
-{"id":"agent-129","message":"Serial SN2600000001 còn bảo hành không? Tôi muốn biết bước tiếp theo.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
-{"id":"agent-130","message":"Serial SN2600000001 còn bảo hành không? Vui lòng không suy đoán.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
-{"id":"agent-131","message":"Serial SN2600000001 còn bảo hành không? Hãy kiểm tra cẩn thận.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
-{"id":"agent-132","message":"Serial SN2600000001 còn bảo hành không? Tôi cần thông tin chính xác.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
-{"id":"agent-133","message":"Serial SN2600000001 còn bảo hành không? Cho tôi kết quả có căn cứ.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
-{"id":"agent-134","message":"Serial SN2600000001 còn bảo hành không? Đây là yêu cầu hỗ trợ khách hàng.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
-{"id":"agent-135","message":"Serial SN2600000001 còn bảo hành không? Tôi đang cần được hỗ trợ.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
-{"id":"agent-136","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
-{"id":"agent-137","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Bạn kiểm tra giúp tôi.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
-{"id":"agent-138","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Tôi cần câu trả lời ngắn gọn.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
-{"id":"agent-139","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Vui lòng xác minh đúng nguồn.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
-{"id":"agent-140","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Đây là câu hỏi cho bản demo.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
-{"id":"agent-141","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Hãy cho tôi biết thông tin hiện tại.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
-{"id":"agent-142","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Tôi đang dùng tài khoản của mình.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
-{"id":"agent-143","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Xin trả lời bằng tiếng Việt.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
-{"id":"agent-144","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Tôi muốn biết bước tiếp theo.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
-{"id":"agent-145","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Vui lòng không suy đoán.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
-{"id":"agent-146","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Hãy kiểm tra cẩn thận.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
-{"id":"agent-147","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Tôi cần thông tin chính xác.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
-{"id":"agent-148","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Cho tôi kết quả có căn cứ.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
-{"id":"agent-149","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Đây là yêu cầu hỗ trợ khách hàng.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
-{"id":"agent-150","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Tôi đang cần được hỗ trợ.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
-{"id":"agent-151","message":"Tôi muốn gặp nhân viên hỗ trợ.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
-{"id":"agent-152","message":"Tôi muốn gặp nhân viên hỗ trợ. Bạn kiểm tra giúp tôi.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
-{"id":"agent-153","message":"Tôi muốn gặp nhân viên hỗ trợ. Tôi cần câu trả lời ngắn gọn.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
-{"id":"agent-154","message":"Tôi muốn gặp nhân viên hỗ trợ. Vui lòng xác minh đúng nguồn.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
-{"id":"agent-155","message":"Tôi muốn gặp nhân viên hỗ trợ. Đây là câu hỏi cho bản demo.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
-{"id":"agent-156","message":"Tôi muốn gặp nhân viên hỗ trợ. Hãy cho tôi biết thông tin hiện tại.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
-{"id":"agent-157","message":"Tôi muốn gặp nhân viên hỗ trợ. Tôi đang dùng tài khoản của mình.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
-{"id":"agent-158","message":"Tôi muốn gặp nhân viên hỗ trợ. Xin trả lời bằng tiếng Việt.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
-{"id":"agent-159","message":"Tôi muốn gặp nhân viên hỗ trợ. Tôi muốn biết bước tiếp theo.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
-{"id":"agent-160","message":"Tôi muốn gặp nhân viên hỗ trợ. Vui lòng không suy đoán.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
-{"id":"agent-161","message":"Tôi muốn gặp nhân viên hỗ trợ. Hãy kiểm tra cẩn thận.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
-{"id":"agent-162","message":"Tôi muốn gặp nhân viên hỗ trợ. Tôi cần thông tin chính xác.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
-{"id":"agent-163","message":"Tôi muốn gặp nhân viên hỗ trợ. Cho tôi kết quả có căn cứ.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
-{"id":"agent-164","message":"Tôi muốn gặp nhân viên hỗ trợ. Đây là yêu cầu hỗ trợ khách hàng.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
-{"id":"agent-165","message":"Tôi muốn gặp nhân viên hỗ trợ. Tôi đang cần được hỗ trợ.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
-{"id":"agent-166","message":"Cảm ơn bạn đã hỗ trợ.","expected_intent":"thanks","expected_tools":[],"critical":false}
-{"id":"agent-167","message":"Cảm ơn bạn đã hỗ trợ. Bạn kiểm tra giúp tôi.","expected_intent":"thanks","expected_tools":[],"critical":false}
-{"id":"agent-168","message":"Cảm ơn bạn đã hỗ trợ. Tôi cần câu trả lời ngắn gọn.","expected_intent":"thanks","expected_tools":[],"critical":false}
-{"id":"agent-169","message":"Cảm ơn bạn đã hỗ trợ. Vui lòng xác minh đúng nguồn.","expected_intent":"thanks","expected_tools":[],"critical":false}
-{"id":"agent-170","message":"Cảm ơn bạn đã hỗ trợ. Đây là câu hỏi cho bản demo.","expected_intent":"thanks","expected_tools":[],"critical":false}
-{"id":"agent-171","message":"Cảm ơn bạn đã hỗ trợ. Hãy cho tôi biết thông tin hiện tại.","expected_intent":"thanks","expected_tools":[],"critical":false}
-{"id":"agent-172","message":"Cảm ơn bạn đã hỗ trợ. Tôi đang dùng tài khoản của mình.","expected_intent":"thanks","expected_tools":[],"critical":false}
-{"id":"agent-173","message":"Cảm ơn bạn đã hỗ trợ. Xin trả lời bằng tiếng Việt.","expected_intent":"thanks","expected_tools":[],"critical":false}
-{"id":"agent-174","message":"Cảm ơn bạn đã hỗ trợ. Tôi muốn biết bước tiếp theo.","expected_intent":"thanks","expected_tools":[],"critical":false}
-{"id":"agent-175","message":"Cảm ơn bạn đã hỗ trợ. Vui lòng không suy đoán.","expected_intent":"thanks","expected_tools":[],"critical":false}
-{"id":"agent-176","message":"Cảm ơn bạn đã hỗ trợ. Hãy kiểm tra cẩn thận.","expected_intent":"thanks","expected_tools":[],"critical":false}
-{"id":"agent-177","message":"Cảm ơn bạn đã hỗ trợ. Tôi cần thông tin chính xác.","expected_intent":"thanks","expected_tools":[],"critical":false}
-{"id":"agent-178","message":"Cảm ơn bạn đã hỗ trợ. Cho tôi kết quả có căn cứ.","expected_intent":"thanks","expected_tools":[],"critical":false}
-{"id":"agent-179","message":"Cảm ơn bạn đã hỗ trợ. Đây là yêu cầu hỗ trợ khách hàng.","expected_intent":"thanks","expected_tools":[],"critical":false}
-{"id":"agent-180","message":"Cảm ơn bạn đã hỗ trợ. Tôi đang cần được hỗ trợ.","expected_intent":"thanks","expected_tools":[],"critical":false}
-{"id":"agent-181","message":"Hãy kể cho tôi lịch sử của một thành phố cổ.","expected_intent":"unknown","expected_tools":[],"critical":false}
-{"id":"agent-182","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Bạn kiểm tra giúp tôi.","expected_intent":"unknown","expected_tools":[],"critical":false}
-{"id":"agent-183","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Tôi cần câu trả lời ngắn gọn.","expected_intent":"unknown","expected_tools":[],"critical":false}
-{"id":"agent-184","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Vui lòng xác minh đúng nguồn.","expected_intent":"unknown","expected_tools":[],"critical":false}
-{"id":"agent-185","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Đây là câu hỏi cho bản demo.","expected_intent":"unknown","expected_tools":[],"critical":false}
-{"id":"agent-186","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Hãy cho tôi biết thông tin hiện tại.","expected_intent":"unknown","expected_tools":[],"critical":false}
-{"id":"agent-187","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Tôi đang dùng tài khoản của mình.","expected_intent":"unknown","expected_tools":[],"critical":false}
-{"id":"agent-188","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Xin trả lời bằng tiếng Việt.","expected_intent":"unknown","expected_tools":[],"critical":false}
-{"id":"agent-189","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Tôi muốn biết bước tiếp theo.","expected_intent":"unknown","expected_tools":[],"critical":false}
-{"id":"agent-190","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Vui lòng không suy đoán.","expected_intent":"unknown","expected_tools":[],"critical":false}
-{"id":"agent-191","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Hãy kiểm tra cẩn thận.","expected_intent":"unknown","expected_tools":[],"critical":false}
-{"id":"agent-192","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Tôi cần thông tin chính xác.","expected_intent":"unknown","expected_tools":[],"critical":false}
-{"id":"agent-193","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Cho tôi kết quả có căn cứ.","expected_intent":"unknown","expected_tools":[],"critical":false}
-{"id":"agent-194","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Đây là yêu cầu hỗ trợ khách hàng.","expected_intent":"unknown","expected_tools":[],"critical":false}
-{"id":"agent-195","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Tôi đang cần được hỗ trợ.","expected_intent":"unknown","expected_tools":[],"critical":false}
-{"id":"agent-196","message":"Xin chào","expected_intent":"greeting","expected_tools":[],"critical":false}
-{"id":"agent-197","message":"Chào","expected_intent":"greeting","expected_tools":[],"critical":false}
-{"id":"agent-198","message":"Hello","expected_intent":"greeting","expected_tools":[],"critical":false}
-{"id":"agent-199","message":"Hi","expected_intent":"greeting","expected_tools":[],"critical":false}
+{"id":"agent-106","message":"Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư?","expected_intent":"faq","expected_tools":["search_knowledge_base"],"critical":false}
+{"id":"agent-107","message":"Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư? Bạn kiểm tra giúp tôi.","expected_intent":"faq","expected_tools":["search_knowledge_base"],"critical":false}
+{"id":"agent-108","message":"Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư? Tôi cần câu trả lời ngắn gọn.","expected_intent":"faq","expected_tools":["search_knowledge_base"],"critical":false}
+{"id":"agent-109","message":"Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư? Vui lòng xác minh đúng nguồn.","expected_intent":"faq","expected_tools":["search_knowledge_base"],"critical":false}
+{"id":"agent-110","message":"Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư? Đây là câu hỏi cho bản demo.","expected_intent":"faq","expected_tools":["search_knowledge_base"],"critical":false}
+{"id":"agent-111","message":"Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư? Hãy cho tôi biết thông tin hiện tại.","expected_intent":"faq","expected_tools":["search_knowledge_base"],"critical":false}
+{"id":"agent-112","message":"Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư? Tôi đang dùng tài khoản của mình.","expected_intent":"faq","expected_tools":["search_knowledge_base"],"critical":false}
+{"id":"agent-113","message":"Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư? Xin trả lời bằng tiếng Việt.","expected_intent":"faq","expected_tools":["search_knowledge_base"],"critical":false}
+{"id":"agent-114","message":"Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư? Tôi muốn biết bước tiếp theo.","expected_intent":"faq","expected_tools":["search_knowledge_base"],"critical":false}
+{"id":"agent-115","message":"Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư? Vui lòng không suy đoán.","expected_intent":"faq","expected_tools":["search_knowledge_base"],"critical":false}
+{"id":"agent-116","message":"Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư? Hãy kiểm tra cẩn thận.","expected_intent":"faq","expected_tools":["search_knowledge_base"],"critical":false}
+{"id":"agent-117","message":"Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư? Tôi cần thông tin chính xác.","expected_intent":"faq","expected_tools":["search_knowledge_base"],"critical":false}
+{"id":"agent-118","message":"Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư? Cho tôi kết quả có căn cứ.","expected_intent":"faq","expected_tools":["search_knowledge_base"],"critical":false}
+{"id":"agent-119","message":"Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư? Đây là yêu cầu hỗ trợ khách hàng.","expected_intent":"faq","expected_tools":["search_knowledge_base"],"critical":false}
+{"id":"agent-120","message":"Cửa hàng lưu hội thoại bao lâu theo quyền riêng tư? Tôi đang cần được hỗ trợ.","expected_intent":"faq","expected_tools":["search_knowledge_base"],"critical":false}
+{"id":"agent-121","message":"Mã DH2026000001 hiện đang ở trạng thái nào?","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
+{"id":"agent-122","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Bạn kiểm tra giúp tôi.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
+{"id":"agent-123","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Tôi cần câu trả lời ngắn gọn.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
+{"id":"agent-124","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Vui lòng xác minh đúng nguồn.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
+{"id":"agent-125","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Đây là câu hỏi cho bản demo.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
+{"id":"agent-126","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Hãy cho tôi biết thông tin hiện tại.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
+{"id":"agent-127","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Tôi đang dùng tài khoản của mình.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
+{"id":"agent-128","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Xin trả lời bằng tiếng Việt.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
+{"id":"agent-129","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Tôi muốn biết bước tiếp theo.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
+{"id":"agent-130","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Vui lòng không suy đoán.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
+{"id":"agent-131","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Hãy kiểm tra cẩn thận.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
+{"id":"agent-132","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Tôi cần thông tin chính xác.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
+{"id":"agent-133","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Cho tôi kết quả có căn cứ.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
+{"id":"agent-134","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Đây là yêu cầu hỗ trợ khách hàng.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
+{"id":"agent-135","message":"Mã DH2026000001 hiện đang ở trạng thái nào? Tôi đang cần được hỗ trợ.","expected_intent":"order_status","expected_tools":["get_order_status"],"critical":false}
+{"id":"agent-136","message":"Đơn DH2026000001 có được hoàn tiền không?","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-137","message":"Đơn DH2026000001 có được hoàn tiền không? Bạn kiểm tra giúp tôi.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-138","message":"Đơn DH2026000001 có được hoàn tiền không? Tôi cần câu trả lời ngắn gọn.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-139","message":"Đơn DH2026000001 có được hoàn tiền không? Vui lòng xác minh đúng nguồn.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-140","message":"Đơn DH2026000001 có được hoàn tiền không? Đây là câu hỏi cho bản demo.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-141","message":"Đơn DH2026000001 có được hoàn tiền không? Hãy cho tôi biết thông tin hiện tại.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-142","message":"Đơn DH2026000001 có được hoàn tiền không? Tôi đang dùng tài khoản của mình.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-143","message":"Đơn DH2026000001 có được hoàn tiền không? Xin trả lời bằng tiếng Việt.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-144","message":"Đơn DH2026000001 có được hoàn tiền không? Tôi muốn biết bước tiếp theo.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-145","message":"Đơn DH2026000001 có được hoàn tiền không? Vui lòng không suy đoán.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-146","message":"Đơn DH2026000001 có được hoàn tiền không? Hãy kiểm tra cẩn thận.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-147","message":"Đơn DH2026000001 có được hoàn tiền không? Tôi cần thông tin chính xác.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-148","message":"Đơn DH2026000001 có được hoàn tiền không? Cho tôi kết quả có căn cứ.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-149","message":"Đơn DH2026000001 có được hoàn tiền không? Đây là yêu cầu hỗ trợ khách hàng.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-150","message":"Đơn DH2026000001 có được hoàn tiền không? Tôi đang cần được hỗ trợ.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-151","message":"Đơn DH2026000001 thanh toán thế nào?","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-152","message":"Đơn DH2026000001 thanh toán thế nào? Bạn kiểm tra giúp tôi.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-153","message":"Đơn DH2026000001 thanh toán thế nào? Tôi cần câu trả lời ngắn gọn.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-154","message":"Đơn DH2026000001 thanh toán thế nào? Vui lòng xác minh đúng nguồn.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-155","message":"Đơn DH2026000001 thanh toán thế nào? Đây là câu hỏi cho bản demo.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-156","message":"Đơn DH2026000001 thanh toán thế nào? Hãy cho tôi biết thông tin hiện tại.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-157","message":"Đơn DH2026000001 thanh toán thế nào? Tôi đang dùng tài khoản của mình.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-158","message":"Đơn DH2026000001 thanh toán thế nào? Xin trả lời bằng tiếng Việt.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-159","message":"Đơn DH2026000001 thanh toán thế nào? Tôi muốn biết bước tiếp theo.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-160","message":"Đơn DH2026000001 thanh toán thế nào? Vui lòng không suy đoán.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-161","message":"Đơn DH2026000001 thanh toán thế nào? Hãy kiểm tra cẩn thận.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-162","message":"Đơn DH2026000001 thanh toán thế nào? Tôi cần thông tin chính xác.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-163","message":"Đơn DH2026000001 thanh toán thế nào? Cho tôi kết quả có căn cứ.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-164","message":"Đơn DH2026000001 thanh toán thế nào? Đây là yêu cầu hỗ trợ khách hàng.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-165","message":"Đơn DH2026000001 thanh toán thế nào? Tôi đang cần được hỗ trợ.","expected_intent":"order_status","expected_tools":["get_order_status","search_knowledge_base"],"critical":false}
+{"id":"agent-166","message":"Serial SN2600000001 còn bảo hành không?","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
+{"id":"agent-167","message":"Serial SN2600000001 còn bảo hành không? Bạn kiểm tra giúp tôi.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
+{"id":"agent-168","message":"Serial SN2600000001 còn bảo hành không? Tôi cần câu trả lời ngắn gọn.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
+{"id":"agent-169","message":"Serial SN2600000001 còn bảo hành không? Vui lòng xác minh đúng nguồn.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
+{"id":"agent-170","message":"Serial SN2600000001 còn bảo hành không? Đây là câu hỏi cho bản demo.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
+{"id":"agent-171","message":"Serial SN2600000001 còn bảo hành không? Hãy cho tôi biết thông tin hiện tại.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
+{"id":"agent-172","message":"Serial SN2600000001 còn bảo hành không? Tôi đang dùng tài khoản của mình.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
+{"id":"agent-173","message":"Serial SN2600000001 còn bảo hành không? Xin trả lời bằng tiếng Việt.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
+{"id":"agent-174","message":"Serial SN2600000001 còn bảo hành không? Tôi muốn biết bước tiếp theo.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
+{"id":"agent-175","message":"Serial SN2600000001 còn bảo hành không? Vui lòng không suy đoán.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
+{"id":"agent-176","message":"Serial SN2600000001 còn bảo hành không? Hãy kiểm tra cẩn thận.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
+{"id":"agent-177","message":"Serial SN2600000001 còn bảo hành không? Tôi cần thông tin chính xác.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
+{"id":"agent-178","message":"Serial SN2600000001 còn bảo hành không? Cho tôi kết quả có căn cứ.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
+{"id":"agent-179","message":"Serial SN2600000001 còn bảo hành không? Đây là yêu cầu hỗ trợ khách hàng.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
+{"id":"agent-180","message":"Serial SN2600000001 còn bảo hành không? Tôi đang cần được hỗ trợ.","expected_intent":"warranty_status","expected_tools":["check_warranty","search_knowledge_base"],"critical":false}
+{"id":"agent-181","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
+{"id":"agent-182","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Bạn kiểm tra giúp tôi.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
+{"id":"agent-183","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Tôi cần câu trả lời ngắn gọn.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
+{"id":"agent-184","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Vui lòng xác minh đúng nguồn.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
+{"id":"agent-185","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Đây là câu hỏi cho bản demo.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
+{"id":"agent-186","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Hãy cho tôi biết thông tin hiện tại.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
+{"id":"agent-187","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Tôi đang dùng tài khoản của mình.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
+{"id":"agent-188","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Xin trả lời bằng tiếng Việt.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
+{"id":"agent-189","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Tôi muốn biết bước tiếp theo.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
+{"id":"agent-190","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Vui lòng không suy đoán.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
+{"id":"agent-191","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Hãy kiểm tra cẩn thận.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
+{"id":"agent-192","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Tôi cần thông tin chính xác.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
+{"id":"agent-193","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Cho tôi kết quả có căn cứ.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
+{"id":"agent-194","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Đây là yêu cầu hỗ trợ khách hàng.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
+{"id":"agent-195","message":"Tôi muốn khiếu nại vì máy sửa nhiều lần vẫn lỗi. Tôi đang cần được hỗ trợ.","expected_intent":"complaint","expected_tools":["create_support_ticket","search_knowledge_base"],"critical":false}
+{"id":"agent-196","message":"Tôi muốn gặp nhân viên hỗ trợ.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
+{"id":"agent-197","message":"Tôi muốn gặp nhân viên hỗ trợ. Bạn kiểm tra giúp tôi.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
+{"id":"agent-198","message":"Tôi muốn gặp nhân viên hỗ trợ. Tôi cần câu trả lời ngắn gọn.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
+{"id":"agent-199","message":"Tôi muốn gặp nhân viên hỗ trợ. Vui lòng xác minh đúng nguồn.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
+{"id":"agent-200","message":"Tôi muốn gặp nhân viên hỗ trợ. Đây là câu hỏi cho bản demo.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
+{"id":"agent-201","message":"Tôi muốn gặp nhân viên hỗ trợ. Hãy cho tôi biết thông tin hiện tại.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
+{"id":"agent-202","message":"Tôi muốn gặp nhân viên hỗ trợ. Tôi đang dùng tài khoản của mình.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
+{"id":"agent-203","message":"Tôi muốn gặp nhân viên hỗ trợ. Xin trả lời bằng tiếng Việt.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
+{"id":"agent-204","message":"Tôi muốn gặp nhân viên hỗ trợ. Tôi muốn biết bước tiếp theo.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
+{"id":"agent-205","message":"Tôi muốn gặp nhân viên hỗ trợ. Vui lòng không suy đoán.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
+{"id":"agent-206","message":"Tôi muốn gặp nhân viên hỗ trợ. Hãy kiểm tra cẩn thận.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
+{"id":"agent-207","message":"Tôi muốn gặp nhân viên hỗ trợ. Tôi cần thông tin chính xác.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
+{"id":"agent-208","message":"Tôi muốn gặp nhân viên hỗ trợ. Cho tôi kết quả có căn cứ.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
+{"id":"agent-209","message":"Tôi muốn gặp nhân viên hỗ trợ. Đây là yêu cầu hỗ trợ khách hàng.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
+{"id":"agent-210","message":"Tôi muốn gặp nhân viên hỗ trợ. Tôi đang cần được hỗ trợ.","expected_intent":"human_support","expected_tools":["create_support_ticket"],"critical":false}
+{"id":"agent-211","message":"Cảm ơn bạn đã hỗ trợ.","expected_intent":"thanks","expected_tools":[],"critical":false}
+{"id":"agent-212","message":"Cảm ơn bạn đã hỗ trợ. Bạn kiểm tra giúp tôi.","expected_intent":"thanks","expected_tools":[],"critical":false}
+{"id":"agent-213","message":"Cảm ơn bạn đã hỗ trợ. Tôi cần câu trả lời ngắn gọn.","expected_intent":"thanks","expected_tools":[],"critical":false}
+{"id":"agent-214","message":"Cảm ơn bạn đã hỗ trợ. Vui lòng xác minh đúng nguồn.","expected_intent":"thanks","expected_tools":[],"critical":false}
+{"id":"agent-215","message":"Cảm ơn bạn đã hỗ trợ. Đây là câu hỏi cho bản demo.","expected_intent":"thanks","expected_tools":[],"critical":false}
+{"id":"agent-216","message":"Cảm ơn bạn đã hỗ trợ. Hãy cho tôi biết thông tin hiện tại.","expected_intent":"thanks","expected_tools":[],"critical":false}
+{"id":"agent-217","message":"Cảm ơn bạn đã hỗ trợ. Tôi đang dùng tài khoản của mình.","expected_intent":"thanks","expected_tools":[],"critical":false}
+{"id":"agent-218","message":"Cảm ơn bạn đã hỗ trợ. Xin trả lời bằng tiếng Việt.","expected_intent":"thanks","expected_tools":[],"critical":false}
+{"id":"agent-219","message":"Cảm ơn bạn đã hỗ trợ. Tôi muốn biết bước tiếp theo.","expected_intent":"thanks","expected_tools":[],"critical":false}
+{"id":"agent-220","message":"Cảm ơn bạn đã hỗ trợ. Vui lòng không suy đoán.","expected_intent":"thanks","expected_tools":[],"critical":false}
+{"id":"agent-221","message":"Cảm ơn bạn đã hỗ trợ. Hãy kiểm tra cẩn thận.","expected_intent":"thanks","expected_tools":[],"critical":false}
+{"id":"agent-222","message":"Cảm ơn bạn đã hỗ trợ. Tôi cần thông tin chính xác.","expected_intent":"thanks","expected_tools":[],"critical":false}
+{"id":"agent-223","message":"Cảm ơn bạn đã hỗ trợ. Cho tôi kết quả có căn cứ.","expected_intent":"thanks","expected_tools":[],"critical":false}
+{"id":"agent-224","message":"Cảm ơn bạn đã hỗ trợ. Đây là yêu cầu hỗ trợ khách hàng.","expected_intent":"thanks","expected_tools":[],"critical":false}
+{"id":"agent-225","message":"Cảm ơn bạn đã hỗ trợ. Tôi đang cần được hỗ trợ.","expected_intent":"thanks","expected_tools":[],"critical":false}
+{"id":"agent-226","message":"Hãy kể cho tôi lịch sử của một thành phố cổ.","expected_intent":"unknown","expected_tools":[],"critical":false}
+{"id":"agent-227","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Bạn kiểm tra giúp tôi.","expected_intent":"unknown","expected_tools":[],"critical":false}
+{"id":"agent-228","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Tôi cần câu trả lời ngắn gọn.","expected_intent":"unknown","expected_tools":[],"critical":false}
+{"id":"agent-229","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Vui lòng xác minh đúng nguồn.","expected_intent":"unknown","expected_tools":[],"critical":false}
+{"id":"agent-230","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Đây là câu hỏi cho bản demo.","expected_intent":"unknown","expected_tools":[],"critical":false}
+{"id":"agent-231","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Hãy cho tôi biết thông tin hiện tại.","expected_intent":"unknown","expected_tools":[],"critical":false}
+{"id":"agent-232","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Tôi đang dùng tài khoản của mình.","expected_intent":"unknown","expected_tools":[],"critical":false}
+{"id":"agent-233","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Xin trả lời bằng tiếng Việt.","expected_intent":"unknown","expected_tools":[],"critical":false}
+{"id":"agent-234","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Tôi muốn biết bước tiếp theo.","expected_intent":"unknown","expected_tools":[],"critical":false}
+{"id":"agent-235","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Vui lòng không suy đoán.","expected_intent":"unknown","expected_tools":[],"critical":false}
+{"id":"agent-236","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Hãy kiểm tra cẩn thận.","expected_intent":"unknown","expected_tools":[],"critical":false}
+{"id":"agent-237","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Tôi cần thông tin chính xác.","expected_intent":"unknown","expected_tools":[],"critical":false}
+{"id":"agent-238","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Cho tôi kết quả có căn cứ.","expected_intent":"unknown","expected_tools":[],"critical":false}
+{"id":"agent-239","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Đây là yêu cầu hỗ trợ khách hàng.","expected_intent":"unknown","expected_tools":[],"critical":false}
+{"id":"agent-240","message":"Hãy kể cho tôi lịch sử của một thành phố cổ. Tôi đang cần được hỗ trợ.","expected_intent":"unknown","expected_tools":[],"critical":false}
+{"id":"agent-241","message":"Xin chào","expected_intent":"greeting","expected_tools":[],"critical":false}
+{"id":"agent-242","message":"Chào","expected_intent":"greeting","expected_tools":[],"critical":false}
+{"id":"agent-243","message":"Hello","expected_intent":"greeting","expected_tools":[],"critical":false}
+{"id":"agent-244","message":"Hi","expected_intent":"greeting","expected_tools":[],"critical":false}

@@ -47,10 +47,7 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
                         content={
                             "error": {
                                 "code": "RATE_LIMITED",
-                                "message": (
-                                    "Bạn đã gửi quá nhiều yêu cầu. "
-                                    "Vui lòng thử lại sau."
-                                ),
+                                "message": ("Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau."),
                             },
                             "request_id": request_id,
                         },
@@ -63,9 +60,7 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
                 else:
                     response = await call_next(request)
                     response.headers["X-RateLimit-Limit"] = str(decision.limit)
-                    response.headers["X-RateLimit-Remaining"] = str(
-                        decision.remaining
-                    )
+                    response.headers["X-RateLimit-Remaining"] = str(decision.remaining)
             else:
                 response = await call_next(request)
             status_code = response.status_code
@@ -127,14 +122,8 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "no-referrer"
-        response.headers["Permissions-Policy"] = (
-            "camera=(), microphone=(), geolocation=()"
-        )
-        response.headers["Content-Security-Policy"] = (
-            "default-src 'none'; frame-ancestors 'none'"
-        )
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+        response.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'"
         response.headers["Cache-Control"] = "no-store"
         if production:
-            response.headers["Strict-Transport-Security"] = (
-                "max-age=31536000; includeSubDomains"
-            )
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"

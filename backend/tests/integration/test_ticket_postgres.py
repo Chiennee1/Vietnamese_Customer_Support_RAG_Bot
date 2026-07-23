@@ -49,20 +49,13 @@ async def test_ticket_is_idempotent_and_scoped_to_authenticated_user() -> None:
             count = len(
                 (
                     await session.scalars(
-                        select(SupportTicket).where(
-                            SupportTicket.idempotency_key == key
-                        )
+                        select(SupportTicket).where(SupportTicket.idempotency_key == key)
                     )
                 ).all()
             )
         assert count == 1
     finally:
         async with database.sessions() as session:
-            await session.execute(
-                delete(SupportTicket).where(
-                    SupportTicket.idempotency_key == key
-                )
-            )
+            await session.execute(delete(SupportTicket).where(SupportTicket.idempotency_key == key))
             await session.commit()
         await database.dispose()
-

@@ -42,9 +42,7 @@ class RouteDecision:
 def normalize_for_routing(message: str) -> str:
     decomposed = unicodedata.normalize("NFD", message.casefold())
     without_marks = "".join(
-        character
-        for character in decomposed
-        if unicodedata.category(character) != "Mn"
+        character for character in decomposed if unicodedata.category(character) != "Mn"
     )
     without_marks = without_marks.replace("đ", "d")
     return re.sub(r"\s+", " ", without_marks).strip()
@@ -72,8 +70,7 @@ class SupportRouter:
             return RouteDecision(Route.UNKNOWN, Intent.UNSAFE_REQUEST, 1.0, ())
 
         if any(
-            term in text
-            for term in ("khieu nai", "phong pin", "boc khoi", "chay no", "de doa")
+            term in text for term in ("khieu nai", "phong pin", "boc khoi", "chay no", "de doa")
         ):
             return RouteDecision(
                 Route.SUPPORT,
@@ -102,10 +99,7 @@ class SupportRouter:
             "bao hanh" in text
             and (
                 re.search(r"\bDH\d{6,}\b", message, re.IGNORECASE)
-                or any(
-                    term in text
-                    for term in ("cua toi", "con", "serial", "may toi")
-                )
+                or any(term in text for term in ("cua toi", "con", "serial", "may toi"))
             )
             and "chinh sach" not in text
         ):
@@ -116,14 +110,36 @@ class SupportRouter:
                 ("check_warranty", "search_knowledge_base"),
             )
         if re.search(r"\bDH\d{6,}\b", message, re.IGNORECASE) or (
-            "don" in text
-            and any(term in text for term in ("trang thai", "giao", "toi dau"))
+            "don" in text and any(term in text for term in ("trang thai", "giao", "toi dau"))
         ):
+            allowed_tools = ["get_order_status"]
+            if any(
+                term in text
+                for term in (
+                    "boi thuong",
+                    "chinh sach",
+                    "doi tra",
+                    "doi may",
+                    "giao mat bao lau",
+                    "hoan tra",
+                    "hoan tien",
+                    "chinh sach giao",
+                    "chinh sach van chuyen",
+                    "phi giao",
+                    "giao cham",
+                    "thoi gian giao",
+                    "thanh toan",
+                    "tra hang",
+                    "that lac",
+                    "van chuyen",
+                )
+            ):
+                allowed_tools.append("search_knowledge_base")
             return RouteDecision(
                 Route.ACCOUNT,
                 Intent.ORDER_STATUS,
                 0.98,
-                ("get_order_status",),
+                tuple(allowed_tools),
             )
         if "doi tra" in text or "hoan tra" in text:
             return RouteDecision(
@@ -153,6 +169,24 @@ class SupportRouter:
                 0.9,
                 ("search_knowledge_base",),
             )
+        if any(
+            term in text
+            for term in (
+                "cau hoi thuong gap",
+                "faq",
+                "quyen rieng tu",
+                "du lieu duoc su dung",
+                "thoi gian luu hoi thoai",
+                "luu hoi thoai bao lau",
+                "pham vi ho tro",
+            )
+        ):
+            return RouteDecision(
+                Route.KNOWLEDGE,
+                Intent.FAQ,
+                0.9,
+                ("search_knowledge_base",),
+            )
         if any(term in text for term in ("con hang", "ton kho", "het hang")):
             return RouteDecision(
                 Route.CATALOG,
@@ -168,8 +202,7 @@ class SupportRouter:
                 ("search_products",),
             )
         if any(
-            term in text
-            for term in ("dien thoai", "iphone", "samsung", "xiaomi", "oppo", "pixel")
+            term in text for term in ("dien thoai", "iphone", "samsung", "xiaomi", "oppo", "pixel")
         ):
             return RouteDecision(
                 Route.CATALOG,

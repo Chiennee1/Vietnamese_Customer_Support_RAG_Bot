@@ -69,9 +69,7 @@ async def test_hybrid_retrieval_only_reads_effective_published_documents(
 
     try:
         async with database.sessions() as session:
-            await session.execute(
-                delete(KnowledgeDocument).where(KnowledgeDocument.title == title)
-            )
+            await session.execute(delete(KnowledgeDocument).where(KnowledgeDocument.title == title))
             uploader = await session.scalar(
                 select(User).where(User.email == "customer0000@example.test")
             )
@@ -88,9 +86,7 @@ async def test_hybrid_retrieval_only_reads_effective_published_documents(
                 filename="retrieval.md",
                 declared_media_type="text/markdown",
             ),
-            content=(
-                "# Bảo hành\nSố serial phải trùng với dữ liệu bảo hành hệ thống."
-            ).encode(),
+            content=("# Bảo hành\nSố serial phải trùng với dữ liệu bảo hành hệ thống.").encode(),
             uploaded_by=uploader.id,
         )
         await ingestion.process(uploaded.id)
@@ -107,9 +103,6 @@ async def test_hybrid_retrieval_only_reads_effective_published_documents(
         assert after_archive.insufficient
     finally:
         async with database.sessions() as session:
-            await session.execute(
-                delete(KnowledgeDocument).where(KnowledgeDocument.title == title)
-            )
+            await session.execute(delete(KnowledgeDocument).where(KnowledgeDocument.title == title))
             await session.commit()
         await database.dispose()
-

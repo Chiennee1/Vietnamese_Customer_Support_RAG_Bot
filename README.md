@@ -9,10 +9,10 @@ hoặc chính sách riêng của cửa hàng.
 
 - Backend FastAPI, PostgreSQL 16 + pgvector, SQLAlchemy async và Alembic.
 - Frontend React/Vite với đăng nhập, chat streaming, citation, feedback và trang
-  quản trị knowledge base.
+  quản trị knowledge base/hàng đợi vận hành.
 - 500 khách hàng synthetic, 100 sản phẩm, 300 SKU, 1.000 đơn hàng, 600 bảo hành
   và 200 ticket.
-- 464 gold cases; toàn bộ release gate hiện đạt.
+- 509 gold cases; toàn bộ deterministic release gate hiện đạt.
 - Docker Compose local và cấu hình Railway cho monorepo đã sẵn sàng.
 
 ```mermaid
@@ -42,6 +42,8 @@ flowchart LR
 
 Không có raw SQL tool. Model không được tự chọn hoặc thay đổi định danh phân
 quyền. Nội dung upload/retrieve luôn được coi là dữ liệu, không phải chỉ thị.
+Các tool đọc dùng PostgreSQL role `app_agent` chỉ có SELECT; migration, web
+workflow và agent không dùng chung credential.
 
 ## Chạy local
 
@@ -64,6 +66,7 @@ Tài khoản synthetic:
 | Vai trò | Email | Mật khẩu demo |
 |---|---|---|
 | Admin | `customer0000@example.test` | `Demo-customer-2026` |
+| Support | `customer0001@example.test` | `Demo-customer-2026` |
 | Customer | `customer0006@example.test` | `Demo-customer-2026` |
 
 Customer trên sở hữu đơn `DH2026000001` và serial `SN2600000001`. Chỉ sử dụng
@@ -77,7 +80,8 @@ trong `data/knowledge/`, chờ trạng thái `ready`, kiểm tra nội dung rồ
 Backend:
 
 ```powershell
-$env:TEST_DATABASE_URL = 'postgresql+asyncpg://app:local-password@127.0.0.1:5432/support_rag'
+$env:TEST_DATABASE_URL = 'postgresql+asyncpg://app_runtime:local-runtime-password@127.0.0.1:5432/support_rag'
+$env:TEST_AGENT_DATABASE_URL = 'postgresql+asyncpg://app_agent:local-agent-password@127.0.0.1:5432/support_rag'
 Set-Location backend
 .\.venv\Scripts\python.exe -m pytest
 .\.venv\Scripts\python.exe -m ruff check app tests ..\scripts
@@ -100,12 +104,12 @@ Baseline ngày 2026-07-23:
 
 | Gate | Kết quả |
 |---|---:|
-| Dataset | 464 cases |
+| Dataset | 509 cases |
 | Offline lexical RAG HitRate@5 / Recall@5 | 0,976 / 0,976 |
 | Offline lexical RAG MRR | 0,889 |
 | Agent intent / tool accuracy | 1,000 / 1,000 |
 | Security critical bypass | 0 |
-| Local HTTP smoke, 20 request / concurrency 4 | 100% success, p95 84 ms |
+| Local HTTP smoke, 20 request / concurrency 4 | 100% success, p95 136 ms |
 
 Load smoke chỉ dùng lời chào deterministic, không đại diện latency hoặc chi phí
 của request có LLM/embedding. Xem phương pháp và giới hạn trong

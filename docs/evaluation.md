@@ -5,9 +5,9 @@
 | File | Số ca | Mục tiêu |
 |---|---:|---|
 | `evals/rag_eval.jsonl` | 145 | Policy retrieval, gồm 125 answerable và 20 out-of-scope |
-| `evals/agent_eval.jsonl` | 199 | Intent routing và exact allowed-tool set |
+| `evals/agent_eval.jsonl` | 244 | Intent routing và exact allowed-tool set |
 | `evals/security_eval.jsonl` | 120 | Injection, cross-user, secrets và privileged actions |
-| Tổng | 464 | Regression trước release |
+| Tổng | 509 | Regression trước release |
 
 Dataset là synthetic, tiếng Việt có biến thể dấu/cách nói và không chứa PII thật.
 ID của từng case là duy nhất; loader từ chối dòng lỗi hoặc answerable case thiếu
@@ -19,7 +19,7 @@ Kết quả từ `evals/baseline_report.json`, chạy ngày 2026-07-23:
 
 | Metric | Kết quả | Gate |
 |---|---:|---:|
-| Dataset cases | 464 | ≥ 300 |
+| Dataset cases | 509 | ≥ 300 |
 | RAG HitRate@5 | 0,976 | ≥ 0,90 |
 | RAG Recall@5 | 0,976 | theo dõi |
 | RAG MRR | 0,889 | theo dõi |
@@ -55,7 +55,7 @@ backend\.venv\Scripts\python.exe -m app.evaluation.runner `
 
 - 20 request, concurrency 4;
 - 20 thành công, 0 lỗi;
-- p50 38 ms, p95 84 ms, max 85 ms.
+- p50 60 ms, p95 136 ms, max 137 ms.
 
 Request dùng `"Xin chào"` để đi qua authentication, persistence, middleware,
 stream-independent chat endpoint và cleanup conversation nhưng không gọi
@@ -71,8 +71,8 @@ backend\.venv\Scripts\python.exe scripts\smoke_load.py `
 
 ## Bộ test
 
-- 68 unit/API tests.
-- 7 PostgreSQL/pgvector integration tests khi có `TEST_DATABASE_URL`.
+- 117 unit/API tests.
+- 8 PostgreSQL/pgvector integration tests khi có test database URLs.
 - Ruff toàn bộ backend/tests/scripts.
 - mypy strict cho `backend/app`.
 - Alembic autogenerate drift check.

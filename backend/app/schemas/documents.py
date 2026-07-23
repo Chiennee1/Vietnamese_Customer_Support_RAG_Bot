@@ -39,4 +39,3 @@ class DocumentResponse(BaseModel):
             published_at=document.published_at,
             failure_reason=document.failure_reason,
         )
-

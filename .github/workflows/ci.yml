@@ -26,8 +26,15 @@ jobs:
       APP_ENV: test
       APP_SECRET: ci-application-secret
       JWT_SECRET: ci-jwt-secret
-      DATABASE_URL: postgresql+asyncpg://app:ci-password@127.0.0.1:5432/support_rag
-      TEST_DATABASE_URL: postgresql+asyncpg://app:ci-password@127.0.0.1:5432/support_rag
+      DATABASE_URL: postgresql+asyncpg://app_runtime:ci-runtime-password@127.0.0.1:5432/support_rag
+      AGENT_DATABASE_URL: postgresql+asyncpg://app_agent:ci-agent-password@127.0.0.1:5432/support_rag
+      MIGRATION_DATABASE_URL: postgresql+asyncpg://app:ci-password@127.0.0.1:5432/support_rag
+      RUNTIME_DB_ROLE: app_runtime
+      RUNTIME_DB_PASSWORD: ci-runtime-password
+      AGENT_DB_ROLE: app_agent
+      AGENT_DB_PASSWORD: ci-agent-password
+      TEST_DATABASE_URL: postgresql+asyncpg://app_runtime:ci-runtime-password@127.0.0.1:5432/support_rag
+      TEST_AGENT_DATABASE_URL: postgresql+asyncpg://app_agent:ci-agent-password@127.0.0.1:5432/support_rag
       OPENAI_API_KEY: ""
     services:
       postgres:
@@ -60,6 +67,7 @@ jobs:
       - name: Apply migrations and seed deterministic fixtures
         run: |
           uv run --no-sync alembic upgrade head
+          uv run --no-sync python -m app.db.provision_runtime_role
           uv run --no-sync python -m app.db.seed
 
       - name: Lint and type-check

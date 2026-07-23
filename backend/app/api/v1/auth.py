@@ -43,4 +43,3 @@ async def me(
         full_name=identity.full_name,
         role=identity.role,
     )
-

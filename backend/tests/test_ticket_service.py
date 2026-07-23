@@ -48,4 +48,3 @@ async def test_ticket_creation_is_idempotent_and_always_open() -> None:
     assert first.ticket_code == second.ticket_code
     assert len(repository.by_key) == 1
     assert first.status == TicketStatus.OPEN
-
