@@ -23,7 +23,16 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60
     cors_origins: str = "http://localhost:5173"
     log_level: str = "INFO"
+    openai_api_key: SecretStr = SecretStr("")
+    embedding_provider: Literal["openai"] = "openai"
+    embedding_model: str = "text-embedding-3-small"
+    embedding_dimensions: int = 1536
+    upload_dir: str = "uploads"
     max_upload_mb: int = 20
+    max_pdf_pages: int = 200
+    chunk_target_tokens: int = 500
+    chunk_max_tokens: int = 700
+    chunk_overlap_tokens: int = 80
     rag_candidate_k: int = 20
     rag_final_k: int = 6
     request_timeout_seconds: int = 30
@@ -48,4 +57,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-

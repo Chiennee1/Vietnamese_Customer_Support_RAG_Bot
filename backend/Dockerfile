@@ -15,6 +15,7 @@ COPY app ./app
 COPY alembic ./alembic
 COPY alembic.ini ./
 RUN uv sync --frozen --no-dev
+RUN mkdir -p /app/uploads && chown -R appuser:appuser /app/uploads
 
 USER appuser
 EXPOSE 8000

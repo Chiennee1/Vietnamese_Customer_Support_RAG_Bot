@@ -4,6 +4,7 @@ from fastapi import Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.core.errors import AppError
+from app.db.models.user import UserRole
 from app.services.auth import AuthenticatedIdentity, AuthService
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -27,3 +28,15 @@ async def get_current_user(
             status_code=401,
         )
     return await service.authenticate(credentials.credentials)
+
+
+async def require_admin(
+    identity: Annotated[AuthenticatedIdentity, Depends(get_current_user)],
+) -> AuthenticatedIdentity:
+    if identity.role != UserRole.ADMIN:
+        raise AppError(
+            code="FORBIDDEN_RESOURCE",
+            message="Bạn không có quyền thực hiện thao tác này.",
+            status_code=403,
+        )
+    return identity
