@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     )
     jwt_secret: SecretStr = SecretStr("change-me")
     access_token_expire_minutes: int = 60
-    cors_origins: str = "http://localhost:5173"
+    cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
     log_level: str = "INFO"
     openai_api_key: SecretStr = SecretStr("")
     llm_provider: Literal["openai"] = "openai"

@@ -2,6 +2,7 @@ from datetime import UTC, date, datetime
 from decimal import Decimal
 from uuid import uuid4
 
+from app.ai.model import ConversationTurn
 from app.ai.orchestrator import (
     GenerationRequest,
     OrchestratorTools,
@@ -263,6 +264,30 @@ async def test_explicit_escalation_creates_one_ticket() -> None:
     assert tickets.calls == 1
     assert result.ticket_code == "TK20260001"
     assert "confirm_ticket_creation" not in result.suggested_actions
+
+
+async def test_ticket_confirmation_uses_only_recent_owned_conversation_context() -> None:
+    tickets = FakeTickets()
+    orchestrator, _ = make_orchestrator(tickets=tickets)
+    history = (
+        ConversationTurn(
+            role="user",
+            content="Máy sửa nhiều lần vẫn lỗi camera, tôi muốn khiếu nại.",
+        ),
+        ConversationTurn(
+            role="assistant",
+            content="Bạn có muốn tôi tạo ticket để chuyển nhân viên xem xét không?",
+        ),
+    )
+
+    result = await orchestrator.respond(
+        "Đồng ý",
+        context=make_context(),
+        history=history,
+    )
+
+    assert tickets.calls == 1
+    assert result.ticket_code == "TK20260001"
 
 
 async def test_prompt_injection_executes_neither_tool_nor_model() -> None:

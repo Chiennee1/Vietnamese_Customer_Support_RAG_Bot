@@ -33,11 +33,13 @@ from app.repositories.commerce import (
     SqlAlchemyProductRepository,
     SqlAlchemyWarrantyRepository,
 )
+from app.repositories.conversations import ConversationRepository
 from app.repositories.documents import SqlAlchemyDocumentRepository
 from app.repositories.retrieval import SqlAlchemyRetrievalRepository
 from app.repositories.tickets import TicketRepository
 from app.repositories.users import SqlAlchemyUserRepository
 from app.services.auth import AuthService
+from app.services.chat import ChatService
 from app.services.documents import DocumentIngestionService
 from app.services.ingestion_jobs import IngestionJobRunner
 from app.services.knowledge import KnowledgeSearchService
@@ -55,6 +57,7 @@ def create_app(
     knowledge_service: KnowledgeSearchService | None = None,
     support_tools: SupportToolSet | None = None,
     orchestrator: SupportOrchestrator | None = None,
+    chat_service: ChatService | None = None,
     run_ingestion_recovery: bool = False,
 ) -> FastAPI:
     resolved_settings = settings or get_settings()
@@ -68,6 +71,7 @@ def create_app(
         or knowledge_service is None
         or support_tools is None
         or orchestrator is None
+        or chat_service is None
     ):
         database = Database(resolved_settings)
     resolved_auth_service = auth_service
@@ -174,6 +178,15 @@ def create_app(
             ),
             max_tool_calls=resolved_settings.max_tool_calls,
         )
+    resolved_chat_service = chat_service
+    if resolved_chat_service is None:
+        if database is None:
+            raise RuntimeError("Chat initialization failed")
+        resolved_chat_service = ChatService(
+            conversations=ConversationRepository(database.sessions),
+            orchestrator=resolved_orchestrator,
+            model_name=resolved_settings.llm_model,
+        )
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
@@ -205,6 +218,7 @@ def create_app(
     app.state.knowledge_service = resolved_knowledge_service
     app.state.support_tools = resolved_support_tools
     app.state.orchestrator = resolved_orchestrator
+    app.state.chat_service = resolved_chat_service
     app.add_middleware(
         CORSMiddleware,
         allow_origins=resolved_settings.allowed_cors_origins,

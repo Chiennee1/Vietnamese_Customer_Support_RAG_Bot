@@ -1,14 +1,26 @@
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from time import perf_counter
 from typing import Any, Protocol
 
 from pydantic import BaseModel
 
-from app.ai.model import GenerationRequest as GenerationRequest
-from app.ai.model import ModelProvider
+from app.ai.model import (
+    ConversationTurn,
+    ModelProvider,
+)
+from app.ai.model import (
+    GenerationRequest as GenerationRequest,
+)
 from app.ai.output_verifier import OutputVerifier
 from app.ai.rag.citations import Citation
-from app.ai.router import Intent, RouteDecision, SupportRouter, normalize_for_routing
+from app.ai.router import (
+    Intent,
+    Route,
+    RouteDecision,
+    SupportRouter,
+    normalize_for_routing,
+)
 from app.ai.tools.contracts import (
     KnowledgeSearchInput,
     KnowledgeSearchOutput,
@@ -45,6 +57,12 @@ class OrchestratorTools:
 
 
 @dataclass(frozen=True, slots=True)
+class ToolExecutionTrace:
+    name: str
+    duration_ms: int
+
+
+@dataclass(frozen=True, slots=True)
 class OrchestratorResult:
     answer: str
     intent: str
@@ -54,6 +72,8 @@ class OrchestratorResult:
     suggested_actions: tuple[str, ...]
     tool_names: tuple[str, ...]
     ticket_code: str | None = None
+    tool_executions: tuple[ToolExecutionTrace, ...] = field(default_factory=tuple)
+    model_used: bool = False
 
 
 class SupportOrchestrator:
@@ -77,6 +97,7 @@ class SupportOrchestrator:
         message: str,
         *,
         context: RuntimeContext,
+        history: tuple[ConversationTurn, ...] = (),
     ) -> OrchestratorResult:
         if not message.strip() or len(message) > 2_000:
             raise AppError(
@@ -85,6 +106,16 @@ class SupportOrchestrator:
                 status_code=422,
             )
         decision = self.router.route(message)
+        if (
+            decision.intent == Intent.UNKNOWN
+            and self._is_ticket_confirmation(message, history)
+        ):
+            decision = RouteDecision(
+                route=Route.SUPPORT,
+                intent=Intent.HUMAN_SUPPORT,
+                confidence=0.99,
+                allowed_tools=("create_support_ticket",),
+            )
         if decision.intent == Intent.UNSAFE_REQUEST:
             return self._direct(
                 "Tôi không thể thực hiện yêu cầu truy cập dữ liệu, SQL, "
@@ -107,6 +138,7 @@ class SupportOrchestrator:
             )
 
         tool_names: list[str] = []
+        tool_executions: list[ToolExecutionTrace] = []
         trusted_context: dict[str, Any] = {}
         citations: list[Citation] = []
         policy_claims = False
@@ -129,6 +161,7 @@ class SupportOrchestrator:
                 decision,
                 "search_knowledge_base",
                 tool_names,
+                tool_executions,
             )
             knowledge = self._expect(knowledge, KnowledgeSearchOutput)
             if knowledge.insufficient:
@@ -143,6 +176,7 @@ class SupportOrchestrator:
                     human_reason=None,
                     suggested_actions=(),
                     tool_names=tuple(tool_names),
+                    tool_executions=tuple(tool_executions),
                 )
             if knowledge.conflict:
                 return OrchestratorResult(
@@ -156,6 +190,7 @@ class SupportOrchestrator:
                     human_reason="KNOWLEDGE_CONFLICT",
                     suggested_actions=("contact_support",),
                     tool_names=tuple(tool_names),
+                    tool_executions=tuple(tool_executions),
                 )
             trusted_context["policy_evidence"] = knowledge.model_dump(mode="json")
             citations = self._citations(knowledge)
@@ -172,6 +207,7 @@ class SupportOrchestrator:
                 decision,
                 "search_products",
                 tool_names,
+                tool_executions,
             )
             products = self._expect(products, ProductSearchOutput)
             trusted_context["current_products"] = products.model_dump(mode="json")
@@ -190,6 +226,7 @@ class SupportOrchestrator:
                 decision,
                 "get_order_status",
                 tool_names,
+                tool_executions,
             )
             order = self._expect(order, OrderStatusOutput)
             trusted_context["current_order"] = order.model_dump(mode="json")
@@ -208,6 +245,7 @@ class SupportOrchestrator:
                 decision,
                 "check_warranty",
                 tool_names,
+                tool_executions,
             )
             warranty = self._expect(warranty, WarrantyStatusOutput)
             knowledge = await self._execute(
@@ -220,6 +258,7 @@ class SupportOrchestrator:
                 decision,
                 "search_knowledge_base",
                 tool_names,
+                tool_executions,
             )
             knowledge = self._expect(knowledge, KnowledgeSearchOutput)
             trusted_context["current_warranty"] = warranty.model_dump(mode="json")
@@ -236,6 +275,7 @@ class SupportOrchestrator:
                     human_reason="KNOWLEDGE_INSUFFICIENT",
                     suggested_actions=("contact_support",),
                     tool_names=tuple(tool_names),
+                    tool_executions=tuple(tool_executions),
                 )
             if knowledge.conflict or knowledge.requires_human:
                 return OrchestratorResult(
@@ -250,6 +290,7 @@ class SupportOrchestrator:
                     human_reason="KNOWLEDGE_CONFLICT",
                     suggested_actions=("contact_support",),
                     tool_names=tuple(tool_names),
+                    tool_executions=tuple(tool_executions),
                 )
             policy_claims = True
             trusted_context["policy_evidence"] = knowledge.model_dump(mode="json")
@@ -261,6 +302,8 @@ class SupportOrchestrator:
                 context=context,
                 decision=decision,
                 tool_names=tool_names,
+                tool_executions=tool_executions,
+                history=history,
             )
 
         else:
@@ -272,6 +315,7 @@ class SupportOrchestrator:
                 user_message=message,
                 trusted_context=trusted_context,
                 citations=citations,
+                history=history[-10:],
             )
         )
         verification = self.verifier.verify(
@@ -293,6 +337,8 @@ class SupportOrchestrator:
             human_reason=None,
             suggested_actions=(),
             tool_names=tuple(tool_names),
+            tool_executions=tuple(tool_executions),
+            model_used=True,
         )
 
     async def _handle_support(
@@ -302,10 +348,12 @@ class SupportOrchestrator:
         context: RuntimeContext,
         decision: RouteDecision,
         tool_names: list[str],
+        tool_executions: list[ToolExecutionTrace],
+        history: tuple[ConversationTurn, ...],
     ) -> OrchestratorResult:
-        severity = self._severity(message)
         normalized = normalize_for_routing(message)
-        explicit = any(
+        confirmation = self._is_ticket_confirmation(message, history)
+        explicit = confirmation or any(
             phrase in normalized
             for phrase in (
                 "tao ticket",
@@ -318,6 +366,8 @@ class SupportOrchestrator:
             )
         )
         ticket_code: str | None = None
+        issue_summary = self._support_summary(message, history) if confirmation else message
+        severity = self._severity(issue_summary)
         if explicit:
             ticket = await self._execute(
                 self.tools.tickets,
@@ -328,13 +378,14 @@ class SupportOrchestrator:
                         else "customer_complaint"
                     ),
                     subject="Yêu cầu hỗ trợ từ hội thoại",
-                    summary=message,
+                    summary=issue_summary,
                     severity=severity,
                 ),
                 context,
                 decision,
                 "create_support_ticket",
                 tool_names,
+                tool_executions,
             )
             ticket = self._expect(ticket, TicketCreationOutput)
             ticket_code = ticket.ticket_code
@@ -365,6 +416,7 @@ class SupportOrchestrator:
             ),
             tool_names=tuple(tool_names),
             ticket_code=ticket_code,
+            tool_executions=tuple(tool_executions),
         )
 
     async def _execute(
@@ -375,6 +427,7 @@ class SupportOrchestrator:
         decision: RouteDecision,
         name: str,
         tool_names: list[str],
+        tool_executions: list[ToolExecutionTrace],
     ) -> Any:
         if name not in decision.allowed_tools:
             raise AppError(
@@ -388,8 +441,15 @@ class SupportOrchestrator:
                 message="Yêu cầu vượt quá giới hạn xử lý an toàn.",
                 status_code=429,
             )
+        started = perf_counter()
         result = await tool.execute(payload, context)
         tool_names.append(name)
+        tool_executions.append(
+            ToolExecutionTrace(
+                name=name,
+                duration_ms=max(0, round((perf_counter() - started) * 1000)),
+            )
+        )
         return result
 
     @staticmethod
@@ -443,6 +503,38 @@ class SupportOrchestrator:
             Intent.PAYMENT_POLICY: "payment",
             Intent.FAQ: "faq",
         }.get(intent)
+
+    @staticmethod
+    def _is_ticket_confirmation(
+        message: str,
+        history: tuple[ConversationTurn, ...],
+    ) -> bool:
+        normalized = normalize_for_routing(message)
+        confirmations = {
+            "dong y",
+            "dong y tao ticket",
+            "duoc",
+            "ok",
+            "tao di",
+            "hay tao",
+        }
+        if normalized not in confirmations or not history:
+            return False
+        last_turn = history[-1]
+        return (
+            last_turn.role == "assistant"
+            and "tao ticket" in normalize_for_routing(last_turn.content)
+        )
+
+    @staticmethod
+    def _support_summary(
+        message: str,
+        history: tuple[ConversationTurn, ...],
+    ) -> str:
+        for turn in reversed(history):
+            if turn.role == "user" and len(turn.content.strip()) >= 5:
+                return turn.content.strip()[:1000]
+        return message.strip()[:1000]
 
     @staticmethod
     def _severity(message: str) -> TicketSeverity:

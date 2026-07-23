@@ -62,6 +62,13 @@ class Message(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         default=list,
     )
     requires_human: Mapped[bool] = mapped_column(nullable=False, default=False)
+    human_reason: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    suggested_actions: Mapped[list[str]] = mapped_column(
+        JSONB,
+        nullable=False,
+        default=list,
+    )
+    ticket_code: Mapped[str | None] = mapped_column(String(40), nullable=True)
 
 
 class ToolExecution(UUIDPrimaryKeyMixin, TimestampMixin, Base):
