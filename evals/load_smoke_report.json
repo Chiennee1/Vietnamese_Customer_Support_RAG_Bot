@@ -4,7 +4,7 @@
   "successful": 20,
   "failed": 0,
   "success_rate": 1.0,
-  "p50_ms": 45,
-  "p95_ms": 89,
-  "maximum_ms": 90
+  "p50_ms": 38,
+  "p95_ms": 84,
+  "maximum_ms": 85
 }

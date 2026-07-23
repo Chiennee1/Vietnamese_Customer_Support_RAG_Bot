@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "vietnamese-customer-support-rag"
-version = "0.1.0"
+version = "1.0.0"
 description = "Production-oriented Vietnamese customer support RAG backend"
 requires-python = ">=3.12"
 dependencies = [

@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+from pydantic import SecretStr
 
 from app.core.config import Settings
 from app.main import create_app
@@ -66,6 +67,29 @@ def test_untrusted_request_id_is_replaced_and_security_headers_are_present() -> 
     assert response.headers["referrer-policy"] == "no-referrer"
     assert response.headers["cache-control"] == "no-store"
     assert "frame-ancestors 'none'" in response.headers["content-security-policy"]
+
+
+def test_production_disables_openapi_and_enables_hsts() -> None:
+    settings = Settings(
+        app_env="production",
+        app_secret=SecretStr("production-app-secret"),
+        jwt_secret=SecretStr("production-jwt-secret"),
+    )
+    client = TestClient(
+        create_app(
+            settings=settings,
+            readiness_probe=HealthyProbe(),
+        )
+    )
+
+    live = client.get("/api/v1/health/live")
+    openapi = client.get("/openapi.json")
+
+    assert live.status_code == 200
+    assert live.headers["strict-transport-security"] == (
+        "max-age=31536000; includeSubDomains"
+    )
+    assert openapi.status_code == 404
 
 
 def test_mutating_requests_are_rate_limited_without_exposing_internals() -> None:

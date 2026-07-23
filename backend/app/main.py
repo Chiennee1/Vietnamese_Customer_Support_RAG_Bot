@@ -242,7 +242,7 @@ def create_app(
 
     app = FastAPI(
         title="Vietnamese Customer Support RAG",
-        version="0.1.0",
+        version="1.0.0",
         docs_url="/docs" if resolved_settings.app_env != "production" else None,
         openapi_url=(
             "/openapi.json"

@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Literal, Self
 
-from pydantic import Field, SecretStr, model_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -50,6 +50,28 @@ class Settings(BaseSettings):
     rate_limit_general_per_window: int = Field(default=120, ge=1, le=10_000)
     conversation_retention_days: int = Field(default=30, ge=1, le=3650)
     retention_interval_seconds: int = Field(default=86_400, ge=60, le=604_800)
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def normalize_async_database_url(cls, value: object) -> object:
+        raw_value = (
+            value.get_secret_value()
+            if isinstance(value, SecretStr)
+            else str(value)
+        )
+        if raw_value.startswith("postgresql://"):
+            raw_value = raw_value.replace(
+                "postgresql://",
+                "postgresql+asyncpg://",
+                1,
+            )
+        elif raw_value.startswith("postgres://"):
+            raw_value = raw_value.replace(
+                "postgres://",
+                "postgresql+asyncpg://",
+                1,
+            )
+        return SecretStr(raw_value)
 
     @model_validator(mode="after")
     def reject_insecure_production_defaults(self) -> Self:

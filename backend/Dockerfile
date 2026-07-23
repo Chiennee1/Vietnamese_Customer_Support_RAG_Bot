@@ -14,10 +14,14 @@ RUN uv sync --frozen --no-dev --no-install-project
 COPY app ./app
 COPY alembic ./alembic
 COPY alembic.ini ./
+COPY docker-entrypoint.sh ./
 RUN uv sync --frozen --no-dev
-RUN mkdir -p /app/uploads && chown -R appuser:appuser /app/uploads
+RUN chmod 755 /app/docker-entrypoint.sh \
+    && mkdir -p /app/uploads \
+    && chown -R appuser:appuser /app/uploads
 
 USER appuser
 EXPOSE 8000
 
-CMD ["uv", "run", "--no-sync", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["sh", "-c", "exec uv run --no-sync uvicorn app.main:app --host 0.0.0.0 --port \"${PORT:-8000}\""]
