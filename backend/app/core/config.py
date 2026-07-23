@@ -35,6 +35,8 @@ class Settings(BaseSettings):
     chunk_overlap_tokens: int = 80
     rag_candidate_k: int = 20
     rag_final_k: int = 6
+    rag_minimum_score: float = 0.015
+    rrf_rank_constant: int = 60
     request_timeout_seconds: int = 30
 
     @model_validator(mode="after")

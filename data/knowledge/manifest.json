@@ -1,0 +1,45 @@
+[
+  {
+    "filename": "warranty-policy-v1.md",
+    "title": "Chính sách bảo hành Điểm Chạm",
+    "version": "1.0",
+    "category": "warranty",
+    "effective_from": "2026-07-01"
+  },
+  {
+    "filename": "return-policy-v1.md",
+    "title": "Chính sách đổi trả Điểm Chạm",
+    "version": "1.0",
+    "category": "returns",
+    "effective_from": "2026-07-01"
+  },
+  {
+    "filename": "shipping-policy-v1.md",
+    "title": "Chính sách giao nhận Điểm Chạm",
+    "version": "1.0",
+    "category": "shipping",
+    "effective_from": "2026-07-01"
+  },
+  {
+    "filename": "payment-policy-v1.md",
+    "title": "Chính sách thanh toán Điểm Chạm",
+    "version": "1.0",
+    "category": "payment",
+    "effective_from": "2026-07-01"
+  },
+  {
+    "filename": "privacy-policy-v1.md",
+    "title": "Thông báo quyền riêng tư Điểm Chạm",
+    "version": "1.0",
+    "category": "privacy",
+    "effective_from": "2026-07-01"
+  },
+  {
+    "filename": "faq-v1.md",
+    "title": "Câu hỏi thường gặp Điểm Chạm",
+    "version": "1.0",
+    "category": "faq",
+    "effective_from": "2026-07-01"
+  }
+]
+

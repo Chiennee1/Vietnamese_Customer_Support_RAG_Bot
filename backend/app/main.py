@@ -8,6 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.ai.rag.chunker import SectionAwareChunker, TiktokenCounter
 from app.ai.rag.embeddings import OpenAIEmbeddingProvider
+from app.ai.rag.reranker import WeightedOverlapReranker
+from app.ai.rag.retriever import HybridRetriever
 from app.api.v1.health import NoopReadinessProbe, ReadinessProbe
 from app.api.v1.router import api_router
 from app.core.config import Settings, get_settings
@@ -16,10 +18,12 @@ from app.core.logging import configure_logging
 from app.core.middleware import RequestContextMiddleware
 from app.db.session import Database, DatabaseReadinessProbe
 from app.repositories.documents import SqlAlchemyDocumentRepository
+from app.repositories.retrieval import SqlAlchemyRetrievalRepository
 from app.repositories.users import SqlAlchemyUserRepository
 from app.services.auth import AuthService
 from app.services.documents import DocumentIngestionService
 from app.services.ingestion_jobs import IngestionJobRunner
+from app.services.knowledge import KnowledgeSearchService
 from app.storage.files import LocalFileStorage
 
 
@@ -30,6 +34,7 @@ def create_app(
     auth_service: AuthService | None = None,
     document_service: DocumentIngestionService | None = None,
     ingestion_runner: IngestionJobRunner | None = None,
+    knowledge_service: KnowledgeSearchService | None = None,
     run_ingestion_recovery: bool = False,
 ) -> FastAPI:
     resolved_settings = settings or get_settings()
@@ -40,6 +45,7 @@ def create_app(
         or readiness_probe is None
         or document_service is None
         or ingestion_runner is None
+        or knowledge_service is None
     ):
         database = Database(resolved_settings)
     resolved_auth_service = auth_service
@@ -58,6 +64,14 @@ def create_app(
         resolved_probe = DatabaseReadinessProbe(database)
     resolved_document_service = document_service
     resolved_ingestion_runner = ingestion_runner
+    resolved_knowledge_service = knowledge_service
+    embedding_provider: OpenAIEmbeddingProvider | None = None
+    if resolved_document_service is None or resolved_knowledge_service is None:
+        embedding_provider = OpenAIEmbeddingProvider(
+            api_key=resolved_settings.openai_api_key.get_secret_value(),
+            model_name=resolved_settings.embedding_model,
+            dimensions=resolved_settings.embedding_dimensions,
+        )
     if resolved_document_service is None or resolved_ingestion_runner is None:
         if database is None:
             raise RuntimeError("Database initialization failed")
@@ -65,7 +79,8 @@ def create_app(
         resolved_document_service = DocumentIngestionService(
             documents=document_repository,
             storage=LocalFileStorage(Path(resolved_settings.upload_dir)),
-            embeddings=OpenAIEmbeddingProvider(
+            embeddings=embedding_provider
+            or OpenAIEmbeddingProvider(
                 api_key=resolved_settings.openai_api_key.get_secret_value(),
                 model_name=resolved_settings.embedding_model,
                 dimensions=resolved_settings.embedding_dimensions,
@@ -83,6 +98,22 @@ def create_app(
             service=resolved_document_service,
             documents=document_repository,
         )
+    if resolved_knowledge_service is None:
+        if database is None or embedding_provider is None:
+            raise RuntimeError("Retrieval initialization failed")
+        resolved_knowledge_service = KnowledgeSearchService(
+            retriever=HybridRetriever(
+                repository=SqlAlchemyRetrievalRepository(database.sessions),
+                embeddings=embedding_provider,
+                candidate_k=resolved_settings.rag_candidate_k,
+                rank_constant=resolved_settings.rrf_rank_constant,
+            ),
+            reranker=WeightedOverlapReranker(),
+            final_k=resolved_settings.rag_final_k,
+            minimum_score=resolved_settings.rag_minimum_score,
+        )
+    if resolved_ingestion_runner is None:
+        raise RuntimeError("Ingestion runner initialization failed")
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
@@ -111,6 +142,7 @@ def create_app(
     app.state.auth_service = resolved_auth_service
     app.state.document_service = resolved_document_service
     app.state.ingestion_runner = resolved_ingestion_runner
+    app.state.knowledge_service = resolved_knowledge_service
     app.add_middleware(
         CORSMiddleware,
         allow_origins=resolved_settings.allowed_cors_origins,

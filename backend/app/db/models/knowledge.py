@@ -8,10 +8,12 @@ from sqlalchemy import (
     DateTime,
     Enum,
     ForeignKey,
+    Index,
     Integer,
     String,
     Text,
     UniqueConstraint,
+    text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
@@ -81,6 +83,17 @@ class KnowledgeChunk(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         UniqueConstraint("document_id", "chunk_index"),
         CheckConstraint("chunk_index >= 0", name="chunk_index_nonnegative"),
         CheckConstraint("token_count > 0", name="token_count_positive"),
+        Index(
+            "ix_knowledge_chunks_embedding_hnsw",
+            "embedding",
+            postgresql_using="hnsw",
+            postgresql_ops={"embedding": "vector_cosine_ops"},
+        ),
+        Index(
+            "ix_knowledge_chunks_content_fts",
+            text("to_tsvector('simple', content_normalized)"),
+            postgresql_using="gin",
+        ),
     )
 
     document_id: Mapped[UUID] = mapped_column(
