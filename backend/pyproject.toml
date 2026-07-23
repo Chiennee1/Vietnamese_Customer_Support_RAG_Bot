@@ -40,6 +40,9 @@ packages = ["app"]
 addopts = "-q --strict-markers --strict-config"
 asyncio_mode = "auto"
 testpaths = ["tests"]
+markers = [
+  "integration: requires a running PostgreSQL/pgvector test database",
+]
 
 [tool.ruff]
 target-version = "py312"
@@ -50,7 +53,9 @@ select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC", "S"]
 ignore = ["S101"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S106"]
+"tests/**" = ["S105", "S106"]
+"app/schemas/auth.py" = ["S105"]
+"app/db/seed.py" = ["S311"]
 
 [tool.mypy]
 python_version = "3.12"
