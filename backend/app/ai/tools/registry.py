@@ -6,6 +6,7 @@ from app.ai.tools.business import (
     WarrantyStatusTool,
 )
 from app.ai.tools.knowledge import KnowledgeBaseTool
+from app.ai.tools.tickets import TicketCreationTool
 
 
 @dataclass(frozen=True, slots=True)
@@ -14,6 +15,7 @@ class SupportToolSet:
     orders: OrderStatusTool
     warranties: WarrantyStatusTool
     knowledge: KnowledgeBaseTool
+    tickets: TicketCreationTool
 
     @property
     def names(self) -> frozenset[str]:
@@ -23,6 +25,6 @@ class SupportToolSet:
                 self.orders.name,
                 self.warranties.name,
                 self.knowledge.name,
+                self.tickets.name,
             }
         )
-

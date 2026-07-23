@@ -31,7 +31,10 @@ services:
       DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://app:local-password@db:5432/support_rag}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      LLM_PROVIDER: ${LLM_PROVIDER:-openai}
       LLM_MODEL: ${LLM_MODEL:-gpt-5-mini}
+      LLM_MAX_OUTPUT_TOKENS: ${LLM_MAX_OUTPUT_TOKENS:-700}
+      MAX_TOOL_CALLS: ${MAX_TOOL_CALLS:-8}
       EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-openai}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
       EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-1536}

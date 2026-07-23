@@ -18,12 +18,16 @@ class OpenAIEmbeddingProvider:
         model_name: str,
         dimensions: int,
         batch_size: int = 100,
+        request_timeout_seconds: int = 30,
     ) -> None:
         self.api_key = api_key
         self.model_name = model_name
         self.dimensions = dimensions
         self.batch_size = batch_size
-        self.client = AsyncOpenAI(api_key=api_key or "missing-development-key")
+        self.client = AsyncOpenAI(
+            api_key=api_key or "missing-development-key",
+            timeout=float(request_timeout_seconds),
+        )
 
     async def embed_documents(self, texts: list[str]) -> list[list[float]]:
         if not self.api_key:

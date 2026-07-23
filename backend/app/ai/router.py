@@ -81,7 +81,17 @@ class SupportRouter:
                 0.98,
                 ("create_support_ticket", "search_knowledge_base"),
             )
-        if any(term in text for term in ("gap nhan vien", "ho tro vien", "chuyen nguoi")):
+        if any(
+            term in text
+            for term in (
+                "gap nhan vien",
+                "ho tro vien",
+                "chuyen nguoi",
+                "chuyen nhan vien",
+                "tao ticket",
+                "mo ticket",
+            )
+        ):
             return RouteDecision(
                 Route.SUPPORT,
                 Intent.HUMAN_SUPPORT,

@@ -6,10 +6,13 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.ai.model import OpenAIModelProvider
+from app.ai.orchestrator import OrchestratorTools, SupportOrchestrator
 from app.ai.rag.chunker import SectionAwareChunker, TiktokenCounter
 from app.ai.rag.embeddings import OpenAIEmbeddingProvider
 from app.ai.rag.reranker import WeightedOverlapReranker
 from app.ai.rag.retriever import HybridRetriever
+from app.ai.router import SupportRouter
 from app.ai.tools.business import (
     OrderStatusTool,
     ProductSearchTool,
@@ -17,6 +20,7 @@ from app.ai.tools.business import (
 )
 from app.ai.tools.knowledge import KnowledgeBaseTool
 from app.ai.tools.registry import SupportToolSet
+from app.ai.tools.tickets import TicketCreationTool
 from app.api.v1.health import NoopReadinessProbe, ReadinessProbe
 from app.api.v1.router import api_router
 from app.core.config import Settings, get_settings
@@ -31,11 +35,13 @@ from app.repositories.commerce import (
 )
 from app.repositories.documents import SqlAlchemyDocumentRepository
 from app.repositories.retrieval import SqlAlchemyRetrievalRepository
+from app.repositories.tickets import TicketRepository
 from app.repositories.users import SqlAlchemyUserRepository
 from app.services.auth import AuthService
 from app.services.documents import DocumentIngestionService
 from app.services.ingestion_jobs import IngestionJobRunner
 from app.services.knowledge import KnowledgeSearchService
+from app.services.tickets import TicketService
 from app.storage.files import LocalFileStorage
 
 
@@ -48,6 +54,7 @@ def create_app(
     ingestion_runner: IngestionJobRunner | None = None,
     knowledge_service: KnowledgeSearchService | None = None,
     support_tools: SupportToolSet | None = None,
+    orchestrator: SupportOrchestrator | None = None,
     run_ingestion_recovery: bool = False,
 ) -> FastAPI:
     resolved_settings = settings or get_settings()
@@ -60,6 +67,7 @@ def create_app(
         or ingestion_runner is None
         or knowledge_service is None
         or support_tools is None
+        or orchestrator is None
     ):
         database = Database(resolved_settings)
     resolved_auth_service = auth_service
@@ -85,6 +93,7 @@ def create_app(
             api_key=resolved_settings.openai_api_key.get_secret_value(),
             model_name=resolved_settings.embedding_model,
             dimensions=resolved_settings.embedding_dimensions,
+            request_timeout_seconds=resolved_settings.request_timeout_seconds,
         )
     if resolved_document_service is None or resolved_ingestion_runner is None:
         if database is None:
@@ -98,6 +107,7 @@ def create_app(
                 api_key=resolved_settings.openai_api_key.get_secret_value(),
                 model_name=resolved_settings.embedding_model,
                 dimensions=resolved_settings.embedding_dimensions,
+                request_timeout_seconds=resolved_settings.request_timeout_seconds,
             ),
             chunker=SectionAwareChunker(
                 target_tokens=resolved_settings.chunk_target_tokens,
@@ -141,6 +151,28 @@ def create_app(
                 SqlAlchemyWarrantyRepository(database.sessions)
             ),
             knowledge=KnowledgeBaseTool(resolved_knowledge_service),
+            tickets=TicketCreationTool(
+                TicketService(TicketRepository(database.sessions))
+            ),
+        )
+    resolved_orchestrator = orchestrator
+    if resolved_orchestrator is None:
+        resolved_orchestrator = SupportOrchestrator(
+            router=SupportRouter(),
+            tools=OrchestratorTools(
+                products=resolved_support_tools.products,
+                orders=resolved_support_tools.orders,
+                warranties=resolved_support_tools.warranties,
+                knowledge=resolved_support_tools.knowledge,
+                tickets=resolved_support_tools.tickets,
+            ),
+            model=OpenAIModelProvider(
+                api_key=resolved_settings.openai_api_key.get_secret_value(),
+                model_name=resolved_settings.llm_model,
+                max_output_tokens=resolved_settings.llm_max_output_tokens,
+                request_timeout_seconds=resolved_settings.request_timeout_seconds,
+            ),
+            max_tool_calls=resolved_settings.max_tool_calls,
         )
 
     @asynccontextmanager
@@ -172,6 +204,7 @@ def create_app(
     app.state.ingestion_runner = resolved_ingestion_runner
     app.state.knowledge_service = resolved_knowledge_service
     app.state.support_tools = resolved_support_tools
+    app.state.orchestrator = resolved_orchestrator
     app.add_middleware(
         CORSMiddleware,
         allow_origins=resolved_settings.allowed_cors_origins,

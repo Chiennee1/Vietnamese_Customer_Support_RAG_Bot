@@ -6,6 +6,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.db.models.order import OrderStatus
+from app.db.models.ticket import TicketSeverity
 from app.db.models.user import UserRole
 from app.db.models.warranty import WarrantyStatus
 
@@ -15,6 +16,8 @@ class RuntimeContext:
     request_id: str
     user_id: UUID
     user_role: UserRole
+    conversation_id: UUID | None = None
+    message_id: UUID | None = None
 
 
 class StrictToolInput(BaseModel):
@@ -119,3 +122,10 @@ class KnowledgeSearchOutput(BaseModel):
     insufficient: bool
     conflict: bool
     requires_human: bool
+
+
+class TicketCreationInput(StrictToolInput):
+    category: str = Field(min_length=2, max_length=80)
+    subject: str = Field(min_length=2, max_length=200)
+    summary: str = Field(min_length=5, max_length=1000)
+    severity: TicketSeverity

@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Literal, Self
 
-from pydantic import SecretStr, model_validator
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -24,6 +24,10 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173"
     log_level: str = "INFO"
     openai_api_key: SecretStr = SecretStr("")
+    llm_provider: Literal["openai"] = "openai"
+    llm_model: str = "gpt-5-mini"
+    llm_max_output_tokens: int = Field(default=700, ge=100, le=10_000)
+    max_tool_calls: int = Field(default=8, ge=1, le=20)
     embedding_provider: Literal["openai"] = "openai"
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = 1536
@@ -37,7 +41,7 @@ class Settings(BaseSettings):
     rag_final_k: int = 6
     rag_minimum_score: float = 0.015
     rrf_rank_constant: int = 60
-    request_timeout_seconds: int = 30
+    request_timeout_seconds: int = Field(default=30, ge=1, le=120)
 
     @model_validator(mode="after")
     def reject_insecure_production_defaults(self) -> Self:
