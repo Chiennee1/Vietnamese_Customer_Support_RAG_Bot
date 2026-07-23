@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     llm_model: str = "gpt-5-mini"
     llm_max_output_tokens: int = Field(default=700, ge=100, le=10_000)
     max_tool_calls: int = Field(default=8, ge=1, le=20)
+    tool_timeout_seconds: int = Field(default=8, ge=1, le=60)
     embedding_provider: Literal["openai"] = "openai"
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = 1536
@@ -42,6 +43,13 @@ class Settings(BaseSettings):
     rag_minimum_score: float = 0.015
     rrf_rank_constant: int = 60
     request_timeout_seconds: int = Field(default=30, ge=1, le=120)
+    rate_limit_window_seconds: int = Field(default=60, ge=1, le=3600)
+    rate_limit_auth_per_window: int = Field(default=10, ge=1, le=10_000)
+    rate_limit_chat_per_window: int = Field(default=30, ge=1, le=10_000)
+    rate_limit_upload_per_window: int = Field(default=20, ge=1, le=10_000)
+    rate_limit_general_per_window: int = Field(default=120, ge=1, le=10_000)
+    conversation_retention_days: int = Field(default=30, ge=1, le=3650)
+    retention_interval_seconds: int = Field(default=86_400, ge=60, le=604_800)
 
     @model_validator(mode="after")
     def reject_insecure_production_defaults(self) -> Self:

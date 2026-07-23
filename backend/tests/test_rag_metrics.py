@@ -33,5 +33,5 @@ def test_repository_rag_baseline_is_well_formed() -> None:
 
     cases = load_rag_gold_cases(path)
 
-    assert len(cases) >= 20
+    assert len(cases) >= 120
     assert any(not case.answerable for case in cases)

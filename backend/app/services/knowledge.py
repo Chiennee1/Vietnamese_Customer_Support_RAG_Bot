@@ -1,8 +1,10 @@
 from dataclasses import dataclass
+from time import perf_counter
 
 from app.ai.rag.citations import Citation
 from app.ai.rag.reranker import Reranker
 from app.ai.rag.retriever import FusedEvidence, HybridRetriever, RetrievalHit
+from app.core.metrics import MetricsRegistry
 
 
 @dataclass(frozen=True, slots=True)
@@ -22,11 +24,13 @@ class KnowledgeSearchService:
         reranker: Reranker,
         final_k: int,
         minimum_score: float,
+        metrics: MetricsRegistry | None = None,
     ) -> None:
         self.retriever = retriever
         self.reranker = reranker
         self.final_k = final_k
         self.minimum_score = minimum_score
+        self.metrics = metrics
 
     async def search(
         self,
@@ -34,6 +38,7 @@ class KnowledgeSearchService:
         *,
         category: str | None = None,
     ) -> KnowledgeSearchResult:
+        started = perf_counter()
         fused = await self.retriever.retrieve(query, category=category)
         reranked = await self.reranker.rerank(query, fused)
         evidence = reranked[: self.final_k]
@@ -52,13 +57,21 @@ class KnowledgeSearchService:
             if not insufficient
             else []
         )
-        return KnowledgeSearchResult(
+        result = KnowledgeSearchResult(
             evidence=evidence,
             citations=citations,
             insufficient=insufficient,
             conflict=conflict,
             requires_human=conflict,
         )
+        if self.metrics is not None:
+            self.metrics.record_rag(
+                insufficient=result.insufficient,
+                conflict=result.conflict,
+                retrieved_count=len(result.evidence),
+                latency_ms=max(0, round((perf_counter() - started) * 1000)),
+            )
+        return result
 
     @staticmethod
     def build_citation(

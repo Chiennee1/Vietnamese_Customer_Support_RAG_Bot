@@ -228,6 +228,26 @@ class ConversationRepository:
             await session.commit()
             return True
 
+    async def delete_expired_conversations(
+        self,
+        *,
+        before: datetime,
+        limit: int = 1000,
+    ) -> int:
+        async with self.sessions() as session:
+            rows = (
+                await session.scalars(
+                    select(Conversation)
+                    .where(Conversation.updated_at < before)
+                    .order_by(Conversation.updated_at.asc())
+                    .limit(limit)
+                )
+            ).all()
+            for row in rows:
+                await session.delete(row)
+            await session.commit()
+            return len(rows)
+
     async def upsert_feedback(
         self,
         *,

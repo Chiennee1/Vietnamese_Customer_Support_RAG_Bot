@@ -1,20 +1,145 @@
-{"id":"rag-001","query":"Điện thoại của tôi còn bảo hành không?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Thời hạn bảo hành","answerable":true}
-{"id":"rag-002","query":"Máy rơi vỡ có được bảo hành không?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Trường hợp loại trừ","answerable":true}
-{"id":"rag-003","query":"Shop có tự duyệt bảo hành qua chat không?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Điều kiện tiếp nhận","answerable":true}
-{"id":"rag-004","query":"Pin phồng thì tôi phải làm gì?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"An toàn pin","answerable":true}
-{"id":"rag-005","query":"Tôi có mấy ngày để yêu cầu đổi trả?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Thời gian gửi yêu cầu","answerable":true}
-{"id":"rag-006","query":"Đổi máy có được hoàn tiền ngay không?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Hoàn tiền và thay thế","answerable":true}
-{"id":"rag-007","query":"Máy chưa kích hoạt có đổi vì không thích màu không?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Sản phẩm không lỗi","answerable":true}
-{"id":"rag-008","query":"Giao nội thành mất bao lâu?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Khu vực và thời gian dự kiến","answerable":true}
-{"id":"rag-009","query":"Đơn giao trễ thì xử lý thế nào?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Chậm giao hoặc thất lạc","answerable":true}
-{"id":"rag-010","query":"Kiện hàng bị móp khi nhận thì làm gì?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Kiểm tra khi nhận","answerable":true}
-{"id":"rag-011","query":"Shop hỗ trợ những cách thanh toán nào?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Phương thức thanh toán","answerable":true}
-{"id":"rag-012","query":"Tôi có cần gửi OTP để kiểm tra thanh toán không?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Bảo vệ thông tin","answerable":true}
-{"id":"rag-013","query":"Tôi bị trừ tiền hai lần thì sao?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Giao dịch chưa xác nhận","answerable":true}
-{"id":"rag-014","query":"Tôi có xem được đơn của người khác không?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Giới hạn truy cập","answerable":true}
-{"id":"rag-015","query":"Chat được lưu trong bao lâu?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Nhật ký và thời gian lưu","answerable":true}
-{"id":"rag-016","query":"Nghi ngờ lộ dữ liệu thì liên hệ ai?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Sự cố dữ liệu","answerable":true}
-{"id":"rag-017","query":"Giá trong FAQ có phải giá hiện tại không?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Giá và tồn kho","answerable":true}
-{"id":"rag-018","query":"Làm sao tra cứu đơn hàng?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Tra cứu đơn hàng","answerable":true}
-{"id":"rag-019","query":"Tôi muốn gặp nhân viên hỗ trợ","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Gặp nhân viên hỗ trợ","answerable":true}
-{"id":"rag-020","query":"Ai vô địch World Cup tiếp theo?","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-001","query":"Thời hạn bảo hành được xác định theo thông tin nào?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Thời hạn bảo hành","answerable":true}
+{"id":"rag-002","query":"Ngày bắt đầu và kết thúc bảo hành xem ở đâu?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Thời hạn bảo hành","answerable":true}
+{"id":"rag-003","query":"Muốn biết máy còn thời hạn bảo hành thì làm gì?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Thời hạn bảo hành","answerable":true}
+{"id":"rag-004","query":"Số serial có dùng để tra thời hạn bảo hành không?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Thời hạn bảo hành","answerable":true}
+{"id":"rag-005","query":"Trạng thái bảo hành hiện tại lấy từ nguồn nào?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Thời hạn bảo hành","answerable":true}
+{"id":"rag-006","query":"Điều kiện để thiết bị được tiếp nhận kiểm tra bảo hành là gì?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Điều kiện tiếp nhận","answerable":true}
+{"id":"rag-007","query":"Tiếp nhận máy có đồng nghĩa đã duyệt bảo hành không?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Điều kiện tiếp nhận","answerable":true}
+{"id":"rag-008","query":"Serial cần đáp ứng gì khi tiếp nhận bảo hành?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Điều kiện tiếp nhận","answerable":true}
+{"id":"rag-009","query":"Kết luận bảo hành cuối cùng có cần kiểm tra kỹ thuật không?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Điều kiện tiếp nhận","answerable":true}
+{"id":"rag-010","query":"Máy còn hạn sẽ được tiếp nhận theo điều kiện nào?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Điều kiện tiếp nhận","answerable":true}
+{"id":"rag-011","query":"Máy rơi vỡ có thuộc trường hợp loại trừ bảo hành không?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Trường hợp loại trừ","answerable":true}
+{"id":"rag-012","query":"Thiết bị vào chất lỏng có được bảo hành không?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Trường hợp loại trừ","answerable":true}
+{"id":"rag-013","query":"Can thiệp bởi nơi không ủy quyền ảnh hưởng bảo hành thế nào?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Trường hợp loại trừ","answerable":true}
+{"id":"rag-014","query":"Thay đổi số serial có bị loại trừ bảo hành không?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Trường hợp loại trừ","answerable":true}
+{"id":"rag-015","query":"Có được kết luận lỗi do khách hàng chỉ qua chat không?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Trường hợp loại trừ","answerable":true}
+{"id":"rag-016","query":"Quy trình hỗ trợ bảo hành bắt đầu bằng mã nào?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Quy trình hỗ trợ","answerable":true}
+{"id":"rag-017","query":"Khi nào bảo hành cần chuyển nhân viên kiểm tra vật lý?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Quy trình hỗ trợ","answerable":true}
+{"id":"rag-018","query":"Máy sửa chữa lặp lại được xử lý trong quy trình nào?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Quy trình hỗ trợ","answerable":true}
+{"id":"rag-019","query":"Hệ thống đối chiếu trạng thái và điều kiện bảo hành ra sao?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Quy trình hỗ trợ","answerable":true}
+{"id":"rag-020","query":"Trường hợp bảo hành nào phải chuyển người thật?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"Quy trình hỗ trợ","answerable":true}
+{"id":"rag-021","query":"Pin phồng thì tôi phải làm gì để an toàn?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"An toàn pin","answerable":true}
+{"id":"rag-022","query":"Thiết bị bốc khói có được tiếp tục sạc không?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"An toàn pin","answerable":true}
+{"id":"rag-023","query":"Máy có mùi khét cần xử lý thế nào?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"An toàn pin","answerable":true}
+{"id":"rag-024","query":"Trợ lý có hướng dẫn tự tháo pin không?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"An toàn pin","answerable":true}
+{"id":"rag-025","query":"Điện thoại nóng bất thường cần dừng sử dụng không?","expected_title":"Chính sách bảo hành Điểm Chạm","expected_section":"An toàn pin","answerable":true}
+{"id":"rag-026","query":"Tôi có bao nhiêu ngày để gửi yêu cầu đổi trả?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Thời gian gửi yêu cầu","answerable":true}
+{"id":"rag-027","query":"Mốc 7 ngày đổi trả tính từ khi nào?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Thời gian gửi yêu cầu","answerable":true}
+{"id":"rag-028","query":"Yêu cầu đổi trả quá hạn ai xem xét?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Thời gian gửi yêu cầu","answerable":true}
+{"id":"rag-029","query":"Trợ lý có tự chấp thuận đổi trả sau thời hạn không?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Thời gian gửi yêu cầu","answerable":true}
+{"id":"rag-030","query":"Thời gian theo lịch để yêu cầu đổi trả là bao lâu?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Thời gian gửi yêu cầu","answerable":true}
+{"id":"rag-031","query":"Sản phẩm cần phụ kiện thế nào khi xem xét đổi trả?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Điều kiện xem xét","answerable":true}
+{"id":"rag-032","query":"Ngoại quan sản phẩm đổi trả do ai xác nhận?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Điều kiện xem xét","answerable":true}
+{"id":"rag-033","query":"Máy bị khóa tài khoản có đáp ứng điều kiện đổi trả không?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Điều kiện xem xét","answerable":true}
+{"id":"rag-034","query":"Mã đơn và serial có cần khớp khi đổi trả không?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Điều kiện xem xét","answerable":true}
+{"id":"rag-035","query":"Can thiệp phần cứng ảnh hưởng điều kiện đổi trả thế nào?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Điều kiện xem xét","answerable":true}
+{"id":"rag-036","query":"Đổi máy vì thay đổi nhu cầu cần điều kiện gì?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Sản phẩm không lỗi","answerable":true}
+{"id":"rag-037","query":"Sản phẩm chưa kích hoạt có thể được xem xét đổi không?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Sản phẩm không lỗi","answerable":true}
+{"id":"rag-038","query":"Bao bì và niêm phong phải thế nào nếu sản phẩm không lỗi?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Sản phẩm không lỗi","answerable":true}
+{"id":"rag-039","query":"Phí phát sinh khi đổi sản phẩm không lỗi do ai xác nhận?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Sản phẩm không lỗi","answerable":true}
+{"id":"rag-040","query":"Muốn đổi màu máy dù không lỗi thì cần điều kiện nào?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Sản phẩm không lỗi","answerable":true}
+{"id":"rag-041","query":"Trợ lý có được hứa hoàn tiền ngay không?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Hoàn tiền và thay thế","answerable":true}
+{"id":"rag-042","query":"Ai xác nhận phương án đổi máy hoặc thay thế?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Hoàn tiền và thay thế","answerable":true}
+{"id":"rag-043","query":"Mức bồi thường có thể được chatbot tự quyết không?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Hoàn tiền và thay thế","answerable":true}
+{"id":"rag-044","query":"Khi nào quyết định hoàn tiền được xác nhận?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Hoàn tiền và thay thế","answerable":true}
+{"id":"rag-045","query":"Backend nghiệp vụ cần ghi nhận gì trước khi hoàn tiền?","expected_title":"Chính sách đổi trả Điểm Chạm","expected_section":"Hoàn tiền và thay thế","answerable":true}
+{"id":"rag-046","query":"Giao nội thành Hồ Chí Minh dự kiến mất mấy ngày?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Khu vực và thời gian dự kiến","answerable":true}
+{"id":"rag-047","query":"Các tỉnh thành khác thường giao trong bao lâu?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Khu vực và thời gian dự kiến","answerable":true}
+{"id":"rag-048","query":"Thời gian giao Hà Nội dự kiến là bao nhiêu?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Khu vực và thời gian dự kiến","answerable":true}
+{"id":"rag-049","query":"Thời gian giao 1 đến 2 ngày áp dụng khu vực nào?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Khu vực và thời gian dự kiến","answerable":true}
+{"id":"rag-050","query":"Trạng thái giao cụ thể lấy từ nguồn hiện tại nào?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Khu vực và thời gian dự kiến","answerable":true}
+{"id":"rag-051","query":"Muốn theo dõi đơn hàng cần đăng nhập không?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Theo dõi đơn hàng","answerable":true}
+{"id":"rag-052","query":"Mã vận chuyển được hiển thị khi nào?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Theo dõi đơn hàng","answerable":true}
+{"id":"rag-053","query":"Có thể tra đơn không thuộc tài khoản của mình không?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Theo dõi đơn hàng","answerable":true}
+{"id":"rag-054","query":"Theo dõi đơn hàng cần cung cấp mã gì?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Theo dõi đơn hàng","answerable":true}
+{"id":"rag-055","query":"Trạng thái đơn hiện tại được lấy từ đâu?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Theo dõi đơn hàng","answerable":true}
+{"id":"rag-056","query":"Đơn quá ngày giao dự kiến thì xử lý thế nào?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Chậm giao hoặc thất lạc","answerable":true}
+{"id":"rag-057","query":"Trợ lý có được tự tuyên bố đơn thất lạc không?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Chậm giao hoặc thất lạc","answerable":true}
+{"id":"rag-058","query":"Khi chậm giao có thể yêu cầu nhân viên kiểm tra không?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Chậm giao hoặc thất lạc","answerable":true}
+{"id":"rag-059","query":"Ticket chậm giao được tạo khi nào?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Chậm giao hoặc thất lạc","answerable":true}
+{"id":"rag-060","query":"Chatbot có được hứa bồi thường đơn thất lạc không?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Chậm giao hoặc thất lạc","answerable":true}
+{"id":"rag-061","query":"Khi nhận hàng cần kiểm tra những gì?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Kiểm tra khi nhận","answerable":true}
+{"id":"rag-062","query":"Kiện hàng móp nghiêm trọng nên làm gì?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Kiểm tra khi nhận","answerable":true}
+{"id":"rag-063","query":"Nếu giao sai sản phẩm thì cần ghi nhận gì?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Kiểm tra khi nhận","answerable":true}
+{"id":"rag-064","query":"Có nên đối chiếu mã đơn trước khi nhận không?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Kiểm tra khi nhận","answerable":true}
+{"id":"rag-065","query":"Kiện rách cần chụp hình và yêu cầu hỗ trợ không?","expected_title":"Chính sách giao nhận Điểm Chạm","expected_section":"Kiểm tra khi nhận","answerable":true}
+{"id":"rag-066","query":"Hệ thống demo có những phương thức thanh toán nào?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Phương thức thanh toán","answerable":true}
+{"id":"rag-067","query":"Có hỗ trợ thanh toán khi nhận hàng không?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Phương thức thanh toán","answerable":true}
+{"id":"rag-068","query":"Trợ lý có trực tiếp thực hiện giao dịch thẻ không?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Phương thức thanh toán","answerable":true}
+{"id":"rag-069","query":"Có thể chuyển khoản hoặc thanh toán qua cổng thẻ không?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Phương thức thanh toán","answerable":true}
+{"id":"rag-070","query":"Trợ lý có hỏi toàn bộ thông tin thẻ không?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Phương thức thanh toán","answerable":true}
+{"id":"rag-071","query":"Tôi có nên gửi OTP trong hội thoại không?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Bảo vệ thông tin","answerable":true}
+{"id":"rag-072","query":"Nhân viên có bao giờ yêu cầu mật khẩu không?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Bảo vệ thông tin","answerable":true}
+{"id":"rag-073","query":"Có được gửi toàn bộ số thẻ cho trợ lý không?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Bảo vệ thông tin","answerable":true}
+{"id":"rag-074","query":"Mã PIN có phải thông tin không được chia sẻ không?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Bảo vệ thông tin","answerable":true}
+{"id":"rag-075","query":"Thông tin thanh toán nào không được gửi qua chat?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Bảo vệ thông tin","answerable":true}
+{"id":"rag-076","query":"Bị trừ tiền nhiều lần thì trợ lý xử lý thế nào?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Giao dịch chưa xác nhận","answerable":true}
+{"id":"rag-077","query":"Trạng thái thanh toán chưa rõ có cần chuyển nhân viên không?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Giao dịch chưa xác nhận","answerable":true}
+{"id":"rag-078","query":"Chatbot có được hứa thời gian hoàn tiền không?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Giao dịch chưa xác nhận","answerable":true}
+{"id":"rag-079","query":"Giao dịch chưa xác nhận cần ghi nhận khiếu nại ra sao?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Giao dịch chưa xác nhận","answerable":true}
+{"id":"rag-080","query":"Khi backend chưa xác nhận có được kết luận hoàn tiền không?","expected_title":"Chính sách thanh toán Điểm Chạm","expected_section":"Giao dịch chưa xác nhận","answerable":true}
+{"id":"rag-081","query":"Giá và tồn kho phải lấy từ tài liệu hay hệ thống hiện tại?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Giá và tồn kho","answerable":true}
+{"id":"rag-082","query":"Tại sao không dùng FAQ làm nguồn giá bán?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Giá và tồn kho","answerable":true}
+{"id":"rag-083","query":"Số lượng tồn kho thay đổi theo thời điểm được tra ở đâu?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Giá và tồn kho","answerable":true}
+{"id":"rag-084","query":"Trợ lý có được nhớ giá cũ để trả lời không?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Giá và tồn kho","answerable":true}
+{"id":"rag-085","query":"Nguồn đúng cho giá bán hiện tại là gì?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Giá và tồn kho","answerable":true}
+{"id":"rag-086","query":"FAQ nói gì về quyền tra cứu đơn hàng?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Tra cứu đơn hàng","answerable":true}
+{"id":"rag-087","query":"Tra mã đơn có cần đăng nhập không?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Tra cứu đơn hàng","answerable":true}
+{"id":"rag-088","query":"Hệ thống trả đơn của tài khoản nào?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Tra cứu đơn hàng","answerable":true}
+{"id":"rag-089","query":"Có thể xem đơn của khách khác qua FAQ không?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Tra cứu đơn hàng","answerable":true}
+{"id":"rag-090","query":"Điều kiện cơ bản để tra cứu đơn là gì?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Tra cứu đơn hàng","answerable":true}
+{"id":"rag-091","query":"Có thể dùng serial để tra bảo hành không?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Tra cứu bảo hành","answerable":true}
+{"id":"rag-092","query":"FAQ hướng dẫn tra cứu bảo hành bằng mã đơn thế nào?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Tra cứu bảo hành","answerable":true}
+{"id":"rag-093","query":"Ngày bảo hành lấy từ hệ thống hay chính sách?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Tra cứu bảo hành","answerable":true}
+{"id":"rag-094","query":"Điều kiện bảo hành chung lấy từ tài liệu nào?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Tra cứu bảo hành","answerable":true}
+{"id":"rag-095","query":"Tra bảo hành có cần đăng nhập không?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Tra cứu bảo hành","answerable":true}
+{"id":"rag-096","query":"Khi nào trợ lý tạo ticket để gặp nhân viên?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Gặp nhân viên hỗ trợ","answerable":true}
+{"id":"rag-097","query":"Khách cần xác nhận gì trước khi tạo ticket?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Gặp nhân viên hỗ trợ","answerable":true}
+{"id":"rag-098","query":"Trợ lý có tóm tắt vấn đề khi chuyển nhân viên không?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Gặp nhân viên hỗ trợ","answerable":true}
+{"id":"rag-099","query":"Có thể yêu cầu gặp người hỗ trợ không?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Gặp nhân viên hỗ trợ","answerable":true}
+{"id":"rag-100","query":"Ticket được tự tạo khi khách chưa đồng ý không?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Gặp nhân viên hỗ trợ","answerable":true}
+{"id":"rag-101","query":"Trợ lý hỗ trợ những nội dung nào?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Ngoài phạm vi","answerable":true}
+{"id":"rag-102","query":"Yêu cầu đặc quyền có nằm ngoài phạm vi không?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Ngoài phạm vi","answerable":true}
+{"id":"rag-103","query":"Truy cập dữ liệu người khác có bị từ chối không?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Ngoài phạm vi","answerable":true}
+{"id":"rag-104","query":"Bot có phải trợ lý tổng quát không giới hạn không?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Ngoài phạm vi","answerable":true}
+{"id":"rag-105","query":"Hành động ngoài chăm sóc khách hàng được xử lý thế nào?","expected_title":"Câu hỏi thường gặp Điểm Chạm","expected_section":"Ngoài phạm vi","answerable":true}
+{"id":"rag-106","query":"Hệ thống dùng những dữ liệu nào để hỗ trợ?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Dữ liệu được sử dụng","answerable":true}
+{"id":"rag-107","query":"Dự án portfolio có dùng hồ sơ khách thật không?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Dữ liệu được sử dụng","answerable":true}
+{"id":"rag-108","query":"Nội dung hỗ trợ được dùng trong phạm vi nào?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Dữ liệu được sử dụng","answerable":true}
+{"id":"rag-109","query":"Dữ liệu tài khoản được dùng khi nào?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Dữ liệu được sử dụng","answerable":true}
+{"id":"rag-110","query":"Dữ liệu synthetic có thay cho dữ liệu khách hàng thật không?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Dữ liệu được sử dụng","answerable":true}
+{"id":"rag-111","query":"Khách hàng được truy cập dữ liệu của ai?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Giới hạn truy cập","answerable":true}
+{"id":"rag-112","query":"Danh tính xác thực lấy từ nội dung chat hay runtime?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Giới hạn truy cập","answerable":true}
+{"id":"rag-113","query":"Có thể nhập mã khách khác để đổi quyền truy cập không?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Giới hạn truy cập","answerable":true}
+{"id":"rag-114","query":"Giới hạn truy cập ticket và hội thoại thế nào?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Giới hạn truy cập","answerable":true}
+{"id":"rag-115","query":"Đơn hàng của người khác có được phép tra cứu không?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Giới hạn truy cập","answerable":true}
+{"id":"rag-116","query":"Hội thoại demo được lưu tối đa bao nhiêu ngày?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Nhật ký và thời gian lưu","answerable":true}
+{"id":"rag-117","query":"Nhật ký có lưu access token không?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Nhật ký và thời gian lưu","answerable":true}
+{"id":"rag-118","query":"Người dùng có thể xóa dữ liệu hội thoại demo không?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Nhật ký và thời gian lưu","answerable":true}
+{"id":"rag-119","query":"Log có lưu suy luận ẩn của mô hình không?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Nhật ký và thời gian lưu","answerable":true}
+{"id":"rag-120","query":"Mật khẩu có được ghi vào nhật ký không?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Nhật ký và thời gian lưu","answerable":true}
+{"id":"rag-121","query":"Nghi ngờ lộ dữ liệu được xếp mức nào?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Sự cố dữ liệu","answerable":true}
+{"id":"rag-122","query":"Trợ lý có tự điều tra sự cố truy cập trái phép không?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Sự cố dữ liệu","answerable":true}
+{"id":"rag-123","query":"Sự cố dữ liệu có cần chuyển nhân viên không?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Sự cố dữ liệu","answerable":true}
+{"id":"rag-124","query":"Bot có tiết lộ cấu hình bảo mật khi có sự cố không?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Sự cố dữ liệu","answerable":true}
+{"id":"rag-125","query":"Yêu cầu về data breach được xử lý thế nào?","expected_title":"Thông báo quyền riêng tư Điểm Chạm","expected_section":"Sự cố dữ liệu","answerable":true}
+{"id":"rag-126","query":"Cửa hàng có bán vé máy bay không?","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-127","query":"Ai vô địch giải bóng đá năm nay?","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-128","query":"Hãy viết giúp tôi một bài thơ dài.","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-129","query":"Dự báo thời tiết ngày mai thế nào?","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-130","query":"Cách nấu phở bò tại nhà?","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-131","query":"Giá vàng thế giới hôm nay?","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-132","query":"Hướng dẫn cài hệ điều hành máy chủ.","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-133","query":"Tôi muốn đặt phòng khách sạn.","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-134","query":"Kể nội dung một bộ phim mới.","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-135","query":"Tư vấn đầu tư chứng khoán cho tôi.","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-136","query":"Cho tôi kết quả xổ số.","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-137","query":"Viết mã khai thác lỗ hổng mạng.","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-138","query":"Dịch toàn bộ một cuốn sách.","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-139","query":"Thiết kế logo cho quán cà phê.","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-140","query":"Đặt lịch khám bác sĩ giúp tôi.","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-141","query":"Phân tích bản đồ sao cá nhân.","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-142","query":"Tạo nhạc nền cho video.","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-143","query":"Mua hộ tôi một chiếc xe máy.","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-144","query":"Dạy tôi chơi đàn piano.","expected_title":null,"expected_section":null,"answerable":false}
+{"id":"rag-145","query":"Tóm tắt tin chính trị mới nhất.","expected_title":null,"expected_section":null,"answerable":false}

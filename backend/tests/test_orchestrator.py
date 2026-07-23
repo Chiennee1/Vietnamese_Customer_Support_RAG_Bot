@@ -1,6 +1,9 @@
+import asyncio
 from datetime import UTC, date, datetime
 from decimal import Decimal
 from uuid import uuid4
+
+import pytest
 
 from app.ai.model import ConversationTurn
 from app.ai.orchestrator import (
@@ -18,6 +21,7 @@ from app.ai.tools.contracts import (
     RuntimeContext,
     WarrantyStatusOutput,
 )
+from app.core.errors import AppError
 from app.db.models.order import OrderStatus
 from app.db.models.ticket import TicketSeverity, TicketStatus
 from app.db.models.user import UserRole
@@ -43,6 +47,13 @@ class NeverCalledTool:
     async def execute(self, payload: object, context: RuntimeContext) -> object:
         self.calls += 1
         raise AssertionError("tool must not be called")
+
+
+class SlowTool:
+    async def execute(self, payload: object, context: RuntimeContext) -> object:
+        del payload, context
+        await asyncio.sleep(0.05)
+        raise AssertionError("timeout should cancel this execution")
 
 
 class FakeOrders:
@@ -168,6 +179,7 @@ def make_orchestrator(
     warranties: ToolExecutor | None = None,
     knowledge: ToolExecutor | None = None,
     tickets: ToolExecutor | None = None,
+    tool_timeout_seconds: float = 8,
 ) -> tuple[SupportOrchestrator, FakeModel]:
     model = FakeModel()
     orchestrator = SupportOrchestrator(
@@ -181,6 +193,7 @@ def make_orchestrator(
         ),
         model=model,
         max_tool_calls=8,
+        tool_timeout_seconds=tool_timeout_seconds,
     )
     return orchestrator, model
 
@@ -307,3 +320,24 @@ async def test_prompt_injection_executes_neither_tool_nor_model() -> None:
     assert tool.calls == 0
     assert not model.requests
     assert result.intent == "unsafe_request"
+
+
+async def test_tool_execution_has_a_hard_timeout() -> None:
+    orchestrator, _ = make_orchestrator(
+        tool_timeout_seconds=0.01,
+    )
+    orchestrator.tools = OrchestratorTools(
+        products=SlowTool(),
+        orders=NeverCalledTool(),
+        warranties=NeverCalledTool(),
+        knowledge=NeverCalledTool(),
+        tickets=NeverCalledTool(),
+    )
+
+    with pytest.raises(AppError) as captured:
+        await orchestrator.respond(
+            "Điện thoại Samsung còn hàng không?",
+            context=make_context(),
+        )
+
+    assert captured.value.code == "TOOL_TIMEOUT"

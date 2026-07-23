@@ -223,3 +223,24 @@ def test_only_admin_can_upload_and_list_documents() -> None:
     assert listed.status_code == 200
     assert listed.json()[0]["status"] == "ready"
 
+
+def test_operational_metrics_are_admin_only_and_contain_no_secrets() -> None:
+    client, auth = make_client()
+    customer_token = login(auth, "customer@example.test")
+    admin_token = login(auth, "admin@example.test")
+
+    forbidden = client.get(
+        "/api/v1/admin/metrics",
+        headers={"authorization": f"Bearer {customer_token}"},
+    )
+    allowed = client.get(
+        "/api/v1/admin/metrics",
+        headers={"authorization": f"Bearer {admin_token}"},
+    )
+
+    assert forbidden.status_code == 403
+    assert allowed.status_code == 200
+    assert {"api", "chat", "rag", "feedback"} <= set(allowed.json())
+    lowered = allowed.text.casefold()
+    assert "authorization" not in lowered
+    assert "access_token" not in lowered

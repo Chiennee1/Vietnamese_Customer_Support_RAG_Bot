@@ -1,12 +1,13 @@
 import os
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 import pytest
 from pydantic import SecretStr
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 from app.core.config import Settings
-from app.db.models.conversation import MessageRole, ToolExecutionStatus
+from app.db.models.conversation import Conversation, MessageRole, ToolExecutionStatus
 from app.db.models.ticket import FeedbackRating
 from app.db.models.user import User
 from app.db.session import Database
@@ -132,4 +133,59 @@ async def test_conversation_repository_enforces_owner_and_feedback_scope() -> No
                 conversation_id,
                 user_id=owner_id,
             )
+        await database.dispose()
+
+
+@pytest.mark.skipif(
+    "TEST_DATABASE_URL" not in os.environ,
+    reason="TEST_DATABASE_URL is required",
+)
+async def test_retention_repository_deletes_only_expired_conversations() -> None:
+    settings = Settings(database_url=SecretStr(os.environ["TEST_DATABASE_URL"]))
+    database = Database(settings)
+    repository = ConversationRepository(database.sessions)
+    active_id = None
+    owner_id = None
+
+    try:
+        async with database.sessions() as session:
+            owner = await session.scalar(
+                select(User).where(User.email == "customer0006@example.test")
+            )
+        assert owner is not None
+        owner_id = owner.id
+        expired = await repository.create_conversation(
+            user_id=owner.id,
+            title="Expired retention test",
+        )
+        active = await repository.create_conversation(
+            user_id=owner.id,
+            title="Active retention test",
+        )
+        active_id = active.id
+        now = datetime.now(UTC)
+        async with database.sessions() as session:
+            await session.execute(
+                update(Conversation)
+                .where(Conversation.id == expired.id)
+                .values(updated_at=now - timedelta(days=31))
+            )
+            await session.commit()
+
+        deleted = await repository.delete_expired_conversations(
+            before=now - timedelta(days=30),
+        )
+
+        assert deleted == 1
+        assert await repository.get_conversation(
+            expired.id,
+            user_id=owner.id,
+        ) is None
+        assert await repository.get_conversation(
+            active.id,
+            user_id=owner.id,
+        ) is not None
+    finally:
+        if active_id is not None and owner_id is not None:
+            await repository.delete_conversation(active_id, user_id=owner_id)
         await database.dispose()

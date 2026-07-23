@@ -1,12 +1,16 @@
+import asyncio
 from dataclasses import dataclass
 from time import perf_counter
 from typing import Protocol
 from uuid import UUID, uuid4
 
+import structlog
+
 from app.ai.model import ConversationTurn
 from app.ai.orchestrator import OrchestratorResult
 from app.ai.tools.contracts import RuntimeContext
 from app.core.errors import AppError
+from app.core.metrics import MetricsRegistry
 from app.db.models.conversation import MessageRole, ToolExecutionStatus
 from app.db.models.ticket import FeedbackRating
 from app.db.models.user import UserRole
@@ -103,11 +107,15 @@ class ChatService:
         orchestrator: OrchestratorProtocol,
         model_name: str,
         history_limit: int = 10,
+        metrics: MetricsRegistry | None = None,
+        request_timeout_seconds: float = 30,
     ) -> None:
         self.conversations = conversations
         self.orchestrator = orchestrator
         self.model_name = model_name
         self.history_limit = history_limit
+        self.metrics = metrics
+        self.request_timeout_seconds = request_timeout_seconds
 
     async def send_message(
         self,
@@ -118,6 +126,7 @@ class ChatService:
         message: str,
         conversation_id: UUID | None,
     ) -> ChatResult:
+        request_started = perf_counter()
         conversation: ConversationRecord | None
         if conversation_id is None:
             conversation = await self.conversations.create_conversation(
@@ -154,19 +163,62 @@ class ChatService:
             ConversationTurn(role=record.role.value, content=record.content)
             for record in history_records[-self.history_limit :]
         )
-        started = perf_counter()
-        result = await self.orchestrator.respond(
-            message,
-            context=RuntimeContext(
-                request_id=request_id,
-                user_id=user_id,
-                user_role=user_role,
-                conversation_id=conversation.id,
-                message_id=user_message_id,
-            ),
-            history=history,
+        orchestration_started = perf_counter()
+        try:
+            async with asyncio.timeout(self.request_timeout_seconds):
+                result = await self.orchestrator.respond(
+                    message,
+                    context=RuntimeContext(
+                        request_id=request_id,
+                        user_id=user_id,
+                        user_role=user_role,
+                        conversation_id=conversation.id,
+                        message_id=user_message_id,
+                    ),
+                    history=history,
+                )
+        except AppError as error:
+            total_latency_ms = max(
+                0,
+                round((perf_counter() - request_started) * 1000),
+            )
+            if self.metrics is not None:
+                self.metrics.record_chat(
+                    intent="unknown",
+                    status=error.code,
+                    latency_ms=total_latency_ms,
+                )
+            structlog.get_logger().warning(
+                "chat_failed",
+                error_code=error.code,
+                total_latency_ms=total_latency_ms,
+            )
+            raise
+        except TimeoutError as error:
+            total_latency_ms = max(
+                0,
+                round((perf_counter() - request_started) * 1000),
+            )
+            if self.metrics is not None:
+                self.metrics.record_chat(
+                    intent="unknown",
+                    status="REQUEST_TIMEOUT",
+                    latency_ms=total_latency_ms,
+                )
+            structlog.get_logger().warning(
+                "chat_failed",
+                error_code="REQUEST_TIMEOUT",
+                total_latency_ms=total_latency_ms,
+            )
+            raise AppError(
+                code="REQUEST_TIMEOUT",
+                message="Yêu cầu hỗ trợ phản hồi quá thời gian.",
+                status_code=504,
+            ) from error
+        orchestration_latency_ms = max(
+            0,
+            round((perf_counter() - orchestration_started) * 1000),
         )
-        latency_ms = max(0, round((perf_counter() - started) * 1000))
         assistant_message_id = uuid4()
         assistant = await self.conversations.add_message(
             MessageCreateRecord(
@@ -176,7 +228,7 @@ class ChatService:
                 content=result.answer,
                 intent=result.intent,
                 model_name=self.model_name if result.model_used else None,
-                latency_ms=latency_ms,
+                latency_ms=orchestration_latency_ms,
                 citations=[
                     {
                         "label": citation.label,
@@ -207,6 +259,29 @@ class ChatService:
                 )
                 for trace in result.tool_executions
             ]
+        )
+        total_latency_ms = max(
+            0,
+            round((perf_counter() - request_started) * 1000),
+        )
+        if self.metrics is not None:
+            self.metrics.record_chat(
+                intent=result.intent,
+                status="success",
+                latency_ms=total_latency_ms,
+                tool_names=result.tool_names,
+                requires_human=result.requires_human,
+                ticket_created=result.ticket_code is not None,
+            )
+        structlog.get_logger().info(
+            "chat_completed",
+            intent=result.intent,
+            tools=result.tool_names,
+            citation_count=len(result.citations),
+            requires_human=result.requires_human,
+            llm_used=result.model_used,
+            orchestration_latency_ms=orchestration_latency_ms,
+            total_latency_ms=total_latency_ms,
         )
         return ChatResult(conversation_id=conversation.id, message=assistant)
 
@@ -270,6 +345,8 @@ class ChatService:
                 message="Không tìm thấy câu trả lời trong dữ liệu được phép truy cập.",
                 status_code=404,
             )
+        if self.metrics is not None:
+            self.metrics.record_feedback(rating.value)
         return feedback
 
     @staticmethod

@@ -1,3 +1,4 @@
+import asyncio
 import re
 from dataclasses import dataclass, field
 from time import perf_counter
@@ -84,12 +85,14 @@ class SupportOrchestrator:
         tools: OrchestratorTools,
         model: ModelProvider,
         max_tool_calls: int,
+        tool_timeout_seconds: float = 8,
         verifier: OutputVerifier | None = None,
     ) -> None:
         self.router = router
         self.tools = tools
         self.model = model
         self.max_tool_calls = max_tool_calls
+        self.tool_timeout_seconds = tool_timeout_seconds
         self.verifier = verifier or OutputVerifier()
 
     async def respond(
@@ -442,7 +445,15 @@ class SupportOrchestrator:
                 status_code=429,
             )
         started = perf_counter()
-        result = await tool.execute(payload, context)
+        try:
+            async with asyncio.timeout(self.tool_timeout_seconds):
+                result = await tool.execute(payload, context)
+        except TimeoutError as error:
+            raise AppError(
+                code="TOOL_TIMEOUT",
+                message="Dịch vụ tra cứu phản hồi quá thời gian.",
+                status_code=504,
+            ) from error
         tool_names.append(name)
         tool_executions.append(
             ToolExecutionTrace(

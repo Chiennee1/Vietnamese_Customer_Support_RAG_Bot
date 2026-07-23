@@ -1,0 +1,10 @@
+{
+  "requests": 20,
+  "concurrency": 4,
+  "successful": 20,
+  "failed": 0,
+  "success_rate": 1.0,
+  "p50_ms": 45,
+  "p95_ms": 89,
+  "maximum_ms": 90
+}

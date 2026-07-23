@@ -25,6 +25,9 @@ dependencies = [
   "uvicorn[standard]>=0.34,<1",
 ]
 
+[project.scripts]
+support-eval = "app.evaluation.runner:main"
+
 [dependency-groups]
 dev = [
   "mypy>=1.15,<2",

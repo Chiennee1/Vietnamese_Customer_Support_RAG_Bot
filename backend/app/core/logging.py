@@ -3,6 +3,8 @@ import sys
 
 import structlog
 
+from app.core.redaction import structlog_redactor
+
 
 def configure_logging(log_level: str) -> None:
     level = getattr(logging, log_level.upper(), logging.INFO)
@@ -10,6 +12,7 @@ def configure_logging(log_level: str) -> None:
     structlog.configure(
         processors=[
             structlog.contextvars.merge_contextvars,
+            structlog_redactor,
             structlog.processors.add_log_level,
             structlog.processors.TimeStamper(fmt="iso", utc=True),
             structlog.processors.JSONRenderer(),
@@ -18,4 +21,3 @@ def configure_logging(log_level: str) -> None:
         logger_factory=structlog.PrintLoggerFactory(file=sys.stdout),
         cache_logger_on_first_use=True,
     )
-

@@ -42,3 +42,26 @@ def test_policy_answer_requires_known_citation_and_rejects_secrets() -> None:
     assert not secret.valid
     assert "SECRET_PATTERN" in secret.errors
 
+
+def test_output_verifier_rejects_promises_internal_markers_and_card_numbers() -> None:
+    verifier = OutputVerifier()
+
+    promise = verifier.verify(
+        answer="Tôi đảm bảo bạn sẽ được hoàn tiền.",
+        citations=[],
+        policy_claims=False,
+    )
+    internal = verifier.verify(
+        answer="BEGIN_TRUSTED_DATA chứa dữ liệu nội bộ.",
+        citations=[],
+        policy_claims=False,
+    )
+    card = verifier.verify(
+        answer="Số thẻ là 4111 1111 1111 1111.",
+        citations=[],
+        policy_claims=False,
+    )
+
+    assert "UNSUPPORTED_PROMISE" in promise.errors
+    assert "INTERNAL_DISCLOSURE" in internal.errors
+    assert "PAYMENT_CARD_PATTERN" in card.errors

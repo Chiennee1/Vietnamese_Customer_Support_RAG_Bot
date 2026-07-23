@@ -1,7 +1,7 @@
 from enum import StrEnum
 from uuid import UUID
 
-from sqlalchemy import Enum, ForeignKey, Integer, String, Text
+from sqlalchemy import Enum, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -21,6 +21,7 @@ class ToolExecutionStatus(StrEnum):
 
 class Conversation(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "conversations"
+    __table_args__ = (Index("ix_conversations_updated_at", "updated_at"),)
 
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"),
