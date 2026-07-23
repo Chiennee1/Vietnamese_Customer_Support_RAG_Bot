@@ -10,6 +10,13 @@ from app.ai.rag.chunker import SectionAwareChunker, TiktokenCounter
 from app.ai.rag.embeddings import OpenAIEmbeddingProvider
 from app.ai.rag.reranker import WeightedOverlapReranker
 from app.ai.rag.retriever import HybridRetriever
+from app.ai.tools.business import (
+    OrderStatusTool,
+    ProductSearchTool,
+    WarrantyStatusTool,
+)
+from app.ai.tools.knowledge import KnowledgeBaseTool
+from app.ai.tools.registry import SupportToolSet
 from app.api.v1.health import NoopReadinessProbe, ReadinessProbe
 from app.api.v1.router import api_router
 from app.core.config import Settings, get_settings
@@ -17,6 +24,11 @@ from app.core.errors import AppError, app_error_handler
 from app.core.logging import configure_logging
 from app.core.middleware import RequestContextMiddleware
 from app.db.session import Database, DatabaseReadinessProbe
+from app.repositories.commerce import (
+    SqlAlchemyOrderRepository,
+    SqlAlchemyProductRepository,
+    SqlAlchemyWarrantyRepository,
+)
 from app.repositories.documents import SqlAlchemyDocumentRepository
 from app.repositories.retrieval import SqlAlchemyRetrievalRepository
 from app.repositories.users import SqlAlchemyUserRepository
@@ -35,6 +47,7 @@ def create_app(
     document_service: DocumentIngestionService | None = None,
     ingestion_runner: IngestionJobRunner | None = None,
     knowledge_service: KnowledgeSearchService | None = None,
+    support_tools: SupportToolSet | None = None,
     run_ingestion_recovery: bool = False,
 ) -> FastAPI:
     resolved_settings = settings or get_settings()
@@ -46,6 +59,7 @@ def create_app(
         or document_service is None
         or ingestion_runner is None
         or knowledge_service is None
+        or support_tools is None
     ):
         database = Database(resolved_settings)
     resolved_auth_service = auth_service
@@ -114,6 +128,20 @@ def create_app(
         )
     if resolved_ingestion_runner is None:
         raise RuntimeError("Ingestion runner initialization failed")
+    resolved_support_tools = support_tools
+    if resolved_support_tools is None:
+        if database is None:
+            raise RuntimeError("Tool initialization failed")
+        resolved_support_tools = SupportToolSet(
+            products=ProductSearchTool(
+                SqlAlchemyProductRepository(database.sessions)
+            ),
+            orders=OrderStatusTool(SqlAlchemyOrderRepository(database.sessions)),
+            warranties=WarrantyStatusTool(
+                SqlAlchemyWarrantyRepository(database.sessions)
+            ),
+            knowledge=KnowledgeBaseTool(resolved_knowledge_service),
+        )
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
@@ -143,6 +171,7 @@ def create_app(
     app.state.document_service = resolved_document_service
     app.state.ingestion_runner = resolved_ingestion_runner
     app.state.knowledge_service = resolved_knowledge_service
+    app.state.support_tools = resolved_support_tools
     app.add_middleware(
         CORSMiddleware,
         allow_origins=resolved_settings.allowed_cors_origins,
