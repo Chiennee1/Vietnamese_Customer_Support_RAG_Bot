@@ -33,7 +33,7 @@ support-provider-faithfulness = "app.evaluation.provider_faithfulness:main"
 dev = [
   "mypy>=1.15,<2",
   "pytest>=8.3,<9",
-  "pytest-asyncio>=0.25,<1",
+  "pytest-asyncio>=0.25,<2",
   "pytest-cov>=6,<7",
   "ruff>=0.11,<1",
 ]
