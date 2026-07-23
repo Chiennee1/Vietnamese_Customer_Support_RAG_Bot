@@ -208,6 +208,8 @@ class DocumentIngestionService:
                 DocumentStatus.FAILED,
                 failure_reason=type(error).__name__,
             )
+            if isinstance(error, AppError):
+                raise
             raise AppError(
                 code="INGESTION_FAILED",
                 message="Không thể xử lý tài liệu.",

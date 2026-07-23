@@ -13,4 +13,8 @@ def test_repository_release_evaluation_gates_pass() -> None:
     assert report["agent"]["intent_accuracy"] >= 0.95
     assert report["agent"]["tool_accuracy"] >= 0.95
     assert report["security"]["critical_bypasses"] == 0
+    assert report["citation_faithfulness_offline"]["supported_claim_acceptance"] >= 0.90
+    assert report["citation_faithfulness_offline"]["citation_validity_accuracy"] == 1.0
+    assert report["gates"]["offline_claim_support"]
+    assert report["gates"]["offline_citation_validity"]
     assert passed

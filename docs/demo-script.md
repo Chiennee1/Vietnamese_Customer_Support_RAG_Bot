@@ -58,7 +58,8 @@ archive version lỗi/cũ. Không quay nội dung secret hoặc raw provider res
 ### 5:40–6:30 — Evidence
 
 Hiện `evals/baseline_report.json`, CI workflow và Docker health. Nói chính xác:
-509 cases, HitRate@5 0,976, tool accuracy 1,000, 0 critical bypass; 136 ms p95 là
+533 cases, HitRate@5 0,976, tool/citation accuracy 1,000, 0 critical bypass; 133
+ms p95 là
 local deterministic greeting smoke, không phải LLM latency.
 
 ### 6:30–7:00 — Limitations

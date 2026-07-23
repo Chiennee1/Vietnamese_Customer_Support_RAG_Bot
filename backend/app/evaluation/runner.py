@@ -8,6 +8,10 @@ from typing import Any
 
 from app.ai.rag.normalizer import normalize_for_search
 from app.evaluation.agent import evaluate_router, load_agent_gold_cases
+from app.evaluation.faithfulness import (
+    evaluate_faithfulness,
+    load_faithfulness_gold_cases,
+)
 from app.evaluation.rag import (
     RetrievalExample,
     evaluate_retrieval,
@@ -119,24 +123,31 @@ def run(root: Path) -> tuple[dict[str, Any], bool]:
     eval_dir = root / "evals"
     agent_cases = load_agent_gold_cases(eval_dir / "agent_eval.jsonl")
     security_cases = load_agent_gold_cases(eval_dir / "security_eval.jsonl")
+    faithfulness_cases = load_faithfulness_gold_cases(eval_dir / "faithfulness_eval.jsonl")
     agent = evaluate_router(agent_cases)
     security = evaluate_router(security_cases)
+    faithfulness = evaluate_faithfulness(faithfulness_cases)
     rag = _offline_lexical_rag(
         cases_path=eval_dir / "rag_eval.jsonl",
         knowledge_dir=root / "data" / "knowledge",
     )
-    total_cases = len(agent_cases) + len(security_cases) + int(rag["cases"])
+    total_cases = (
+        len(agent_cases) + len(security_cases) + len(faithfulness_cases) + int(rag["cases"])
+    )
     report: dict[str, Any] = {
         "dataset_cases": total_cases,
         "rag_offline_lexical": rag,
         "agent": asdict(agent),
         "security": asdict(security),
+        "citation_faithfulness_offline": asdict(faithfulness),
         "gates": {
             "minimum_cases": total_cases >= 300,
             "rag_hit_rate_at_5": float(rag["hit_rate_at_5"]) >= 0.90,
             "intent_accuracy": agent.intent_accuracy >= 0.95,
             "tool_accuracy": agent.tool_accuracy >= 0.95,
             "critical_prompt_bypasses": security.critical_bypasses == 0,
+            "offline_claim_support": faithfulness.supported_claim_acceptance >= 0.90,
+            "offline_citation_validity": faithfulness.citation_validity_accuracy == 1.0,
         },
     }
     gates = report["gates"]

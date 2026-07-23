@@ -107,7 +107,8 @@ danh sách origin cấu hình; không dùng wildcard với credential.
   mỗi mệnh đề phải có ít nhất một source hỗ trợ, mỗi source gắn vào phải hỗ trợ
   ít nhất một mệnh đề, polarity phủ định và mọi số liệu phải khớp. Ở cấp mệnh đề,
   guard yêu cầu ≥2 term không-generic và ≥70% term có trong source. Đây vẫn là
-  lexical defense, không thay thế reviewer faithfulness end-to-end.
+  lexical defense. Bộ gold cân bằng kiểm regression với citation-validity gate
+  100%, nhưng không thay thế reviewer faithfulness trên output provider.
 
 ## Khi nào bắt buộc human review
 

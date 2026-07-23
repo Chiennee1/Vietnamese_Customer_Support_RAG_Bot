@@ -34,22 +34,24 @@ rule/state rõ ràng. LLM không phải nơi thực thi authorization hoặc sid
 
 ### Honest evaluation
 
-509 gold cases là regression deterministic. Baseline 0,976 HitRate@5 và 1,000
-tool accuracy không được quảng bá thành end-to-end model faithfulness. Load smoke
-136 ms p95 là greeting không gọi model.
+533 gold cases là regression deterministic. Baseline 0,976 HitRate@5, 1,000 tool
+accuracy và 1,000 offline citation validity không được quảng bá thành
+provider-generated end-to-end faithfulness. Load smoke 133 ms p95 là greeting
+không gọi model.
 
 ## Kết quả kiểm chứng
 
-- 117 unit/API + 8 PostgreSQL integration tests.
+- 135 unit/API/adapter + 8 PostgreSQL integration tests.
 - Cross-user order/warranty/conversation/feedback bị từ chối ở repository/API.
-- 145 RAG, 244 agent, 120 security cases; 0 critical bypass.
+- 145 RAG, 244 agent, 120 security và 24 faithfulness/citation cases; 0 critical
+  bypass.
 - Alembic rollback/upgrade và schema drift check.
 - Backend/frontend production container build và Docker smoke.
 - Security headers, log redaction, rate limit, timeout và 30-day retention.
 
 ## Failure modes đã xử lý
 
-- Provider timeout → safe error, không guess.
+- Provider timeout → bounded retry, circuit breaker và safe error, không guess.
 - DB down → readiness 503, không fake commerce result.
 - Missing/conflicting knowledge → không xác nhận, human review.
 - Unsupported refund/replacement/warranty promise → output verifier chặn.
@@ -63,15 +65,16 @@ tool accuracy không được quảng bá thành end-to-end model faithfulness. 
   hơn cho scale/zero-downtime.
 - SSE hiện stream answer đã được guard/persist, không token-stream trực tiếp từ
   provider; latency đầu tiên cao hơn nhưng không stream nội dung chưa verify.
-- Offline lexical eval deterministic và rẻ, nhưng cần online dense/hybrid +
-  reviewer faithfulness khi production corpus ổn định.
+- Offline lexical/citation eval deterministic và rẻ, nhưng vẫn cần online
+  dense/hybrid. Provider-generated gate đã có nhưng cần secret/budget để chạy
+  theo đúng model release, sau đó vẫn cần reviewer sampling.
 
 ## Hướng cải tiến
 
 1. Object storage + background queue cho ingestion.
 2. Redis/shared limiter và Prometheus/OpenTelemetry.
 3. JWT rotation/revocation, SSO và immutable audit log.
-4. End-to-end citation precision/faithfulness evaluation.
+4. Chạy provider-generated gate mỗi release và bổ sung reviewer sampling.
 5. Reranker benchmark và per-intent latency/cost.
 6. Ticket integration với hệ thống support thật sau approval/idempotency design.
 
@@ -83,7 +86,8 @@ tool accuracy không được quảng bá thành end-to-end model faithfulness. 
 
 > Designed backend-enforced source-of-truth and ownership boundaries, deterministic
 > tool routing, prompt-injection defenses and human escalation; validated them on
-> 509 synthetic RAG/agent/security cases with zero critical routing bypasses.
+> 533 synthetic RAG/agent/security/citation cases with zero critical routing
+> bypasses and 100% offline citation-validity accuracy.
 
 > Implemented idempotent document ingestion, hybrid retrieval, validated citations,
 > Alembic migrations, structured privacy-safe observability, Docker/Railway

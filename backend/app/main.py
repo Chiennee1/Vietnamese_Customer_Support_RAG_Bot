@@ -116,6 +116,12 @@ def create_app(
             model_name=resolved_settings.embedding_model,
             dimensions=resolved_settings.embedding_dimensions,
             request_timeout_seconds=resolved_settings.request_timeout_seconds,
+            provider_max_attempts=resolved_settings.provider_max_attempts,
+            provider_retry_base_seconds=resolved_settings.provider_retry_base_seconds,
+            provider_circuit_failure_threshold=(
+                resolved_settings.provider_circuit_failure_threshold
+            ),
+            provider_circuit_recovery_seconds=(resolved_settings.provider_circuit_recovery_seconds),
         )
     if resolved_document_service is None or resolved_ingestion_runner is None:
         if database is None:
@@ -130,6 +136,14 @@ def create_app(
                 model_name=resolved_settings.embedding_model,
                 dimensions=resolved_settings.embedding_dimensions,
                 request_timeout_seconds=resolved_settings.request_timeout_seconds,
+                provider_max_attempts=resolved_settings.provider_max_attempts,
+                provider_retry_base_seconds=resolved_settings.provider_retry_base_seconds,
+                provider_circuit_failure_threshold=(
+                    resolved_settings.provider_circuit_failure_threshold
+                ),
+                provider_circuit_recovery_seconds=(
+                    resolved_settings.provider_circuit_recovery_seconds
+                ),
             ),
             chunker=SectionAwareChunker(
                 target_tokens=resolved_settings.chunk_target_tokens,
@@ -188,6 +202,17 @@ def create_app(
                 model_name=resolved_settings.llm_model,
                 max_output_tokens=resolved_settings.llm_max_output_tokens,
                 request_timeout_seconds=resolved_settings.request_timeout_seconds,
+                provider_max_attempts=resolved_settings.provider_max_attempts,
+                provider_retry_base_seconds=resolved_settings.provider_retry_base_seconds,
+                provider_circuit_failure_threshold=(
+                    resolved_settings.provider_circuit_failure_threshold
+                ),
+                provider_circuit_recovery_seconds=(
+                    resolved_settings.provider_circuit_recovery_seconds
+                ),
+                input_cost_per_million_usd=(resolved_settings.llm_input_cost_per_million_usd),
+                output_cost_per_million_usd=(resolved_settings.llm_output_cost_per_million_usd),
+                usage_recorder=resolved_metrics.record_llm_usage,
             ),
             max_tool_calls=resolved_settings.max_tool_calls,
             tool_timeout_seconds=resolved_settings.tool_timeout_seconds,

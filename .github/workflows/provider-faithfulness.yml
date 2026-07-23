@@ -1,0 +1,39 @@
+name: Provider-generated faithfulness gate
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  provider-faithfulness:
+    name: Live model faithfulness and citation validity
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      APP_ENV: test
+      APP_SECRET: ci-application-secret
+      JWT_SECRET: ci-jwt-secret
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Install uv and Python
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+
+      - name: Install locked dependencies
+        run: uv sync --locked --dev
+
+      - name: Enforce provider-generated answer gates
+        run: >-
+          uv run --no-sync support-provider-faithfulness
+          --output ../evals/provider_faithfulness_report.json

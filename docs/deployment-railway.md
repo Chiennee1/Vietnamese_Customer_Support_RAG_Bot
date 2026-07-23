@@ -4,7 +4,7 @@ Tài liệu này dùng kiến trúc ba service: `Postgres` (image/template có p
 `backend` và `frontend`. Repository là isolated monorepo; mỗi application có
 Dockerfile và `railway.toml` riêng.
 
-> Trạng thái workspace ngày 2026-07-23: cấu hình đã được build/test local nhưng
+> Trạng thái workspace ngày 2026-07-24: cấu hình đã được build/test local nhưng
 > chưa có Railway CLI, token, project hoặc Git remote nên chưa thể tạo live URL
 > từ workspace này. Không được coi “deployment-ready” là “đã deploy”.
 
@@ -72,6 +72,12 @@ OPENAI_API_KEY=<sealed-provider-key>
 LLM_PROVIDER=openai
 LLM_MODEL=gpt-5-mini
 LLM_MAX_OUTPUT_TOKENS=700
+LLM_INPUT_COST_PER_MILLION_USD=0.25
+LLM_OUTPUT_COST_PER_MILLION_USD=2.0
+PROVIDER_MAX_ATTEMPTS=3
+PROVIDER_RETRY_BASE_SECONDS=0.2
+PROVIDER_CIRCUIT_FAILURE_THRESHOLD=3
+PROVIDER_CIRCUIT_RECOVERY_SECONDS=30
 EMBEDDING_PROVIDER=openai
 EMBEDDING_MODEL=text-embedding-3-small
 EMBEDDING_DIMENSIONS=1536
@@ -85,6 +91,13 @@ Các timeout, RAG, rate limit và upload limit còn lại có default an toàn t
 `.env.example`; chỉ override khi đã đo. `RAILWAY_RUN_UID=0` cho phép entrypoint
 chown volume Railway rồi lập tức hạ process xuống UID/GID 10001 bằng `setpriv`.
 Kiểm tra log startup để chắc process app không chạy root.
+
+Hai mức giá trên là cấu hình ước tính cho `gpt-5-mini` standard tại thời điểm
+2026-07-24. Kiểm tra lại
+<https://openai.com/index/introducing-gpt-5-for-developers/> trước mỗi lần đổi
+model/service tier; hóa đơn provider vẫn là nguồn chi phí chính thức. Process
+metric hiện tính toàn bộ input theo mức uncached nên có thể overestimate khi có
+cached input.
 
 `backend/railway.toml` đảm nhiệm:
 
@@ -178,12 +191,14 @@ Kiểm tra thủ công:
 Thứ tự release:
 
 1. CI xanh và review migration.
-2. Tạo backup; ghi lại deployment ID và DB revision.
-3. Pre-deploy migration.
-4. Backend health/readiness.
-5. Frontend deploy.
-6. Smoke test.
-7. Theo dõi error/p95/no-evidence trong 15–30 phút.
+2. Provider-generated faithfulness ≥ 0,90 và citation validity = 1,00 cho model
+   release.
+3. Tạo backup; ghi lại deployment ID và DB revision.
+4. Pre-deploy migration.
+5. Backend health/readiness.
+6. Frontend deploy.
+7. Smoke test.
+8. Theo dõi error/p95/no-evidence trong 15–30 phút.
 
 Rollback code bằng Railway deployment rollback về image trước. Chỉ downgrade DB
 khi migration đã được chứng minh backward-compatible và runbook của migration cho

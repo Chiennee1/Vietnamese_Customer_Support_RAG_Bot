@@ -23,6 +23,7 @@ class MetricsRegistry:
         self.tool_calls: Counter[str] = Counter()
         self.feedback: Counter[str] = Counter()
         self.rag_results: Counter[str] = Counter()
+        self.llm_models: Counter[str] = Counter()
         self.request_latencies: dict[str, deque[int]] = defaultdict(
             lambda: deque(maxlen=latency_sample_limit)
         )
@@ -30,6 +31,10 @@ class MetricsRegistry:
         self.rag_latencies: deque[int] = deque(maxlen=latency_sample_limit)
         self.ticket_count = 0
         self.human_escalation_count = 0
+        self.llm_usage_response_count = 0
+        self.llm_input_tokens = 0
+        self.llm_output_tokens = 0
+        self.llm_estimated_cost_usd = 0.0
 
     def record_request(
         self,
@@ -78,6 +83,19 @@ class MetricsRegistry:
         self.rag_results["retrieved_items"] += retrieved_count
         self.rag_latencies.append(latency_ms)
 
+    def record_llm_usage(
+        self,
+        model: str,
+        input_tokens: int,
+        output_tokens: int,
+        estimated_cost_usd: float,
+    ) -> None:
+        self.llm_usage_response_count += 1
+        self.llm_models[model] += 1
+        self.llm_input_tokens += input_tokens
+        self.llm_output_tokens += output_tokens
+        self.llm_estimated_cost_usd += estimated_cost_usd
+
     def snapshot(self) -> dict[str, Any]:
         total_feedback = sum(self.feedback.values())
         total_chat = sum(self.chat_results.values())
@@ -102,6 +120,13 @@ class MetricsRegistry:
             "rag": {
                 **dict(sorted(self.rag_results.items())),
                 "latency": asdict(self._latency(self.rag_latencies)),
+            },
+            "llm": {
+                "responses_with_usage": self.llm_usage_response_count,
+                "models": dict(sorted(self.llm_models.items())),
+                "input_tokens": self.llm_input_tokens,
+                "output_tokens": self.llm_output_tokens,
+                "estimated_cost_usd": round(self.llm_estimated_cost_usd, 8),
             },
             "feedback": {
                 "ratings": dict(sorted(self.feedback.items())),

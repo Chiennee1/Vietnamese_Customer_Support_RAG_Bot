@@ -1,5 +1,5 @@
 {
-  "dataset_cases": 509,
+  "dataset_cases": 533,
   "rag_offline_lexical": {
     "cases": 145,
     "answerable_cases": 125,
@@ -19,12 +19,22 @@
     "tool_accuracy": 1.0,
     "critical_bypasses": 0
   },
+  "citation_faithfulness_offline": {
+    "cases": 24,
+    "supported_cases": 12,
+    "unsupported_cases": 12,
+    "supported_claim_acceptance": 1.0,
+    "unsupported_claim_rejection": 1.0,
+    "citation_validity_accuracy": 1.0
+  },
   "gates": {
     "minimum_cases": true,
     "rag_hit_rate_at_5": true,
     "intent_accuracy": true,
     "tool_accuracy": true,
-    "critical_prompt_bypasses": true
+    "critical_prompt_bypasses": true,
+    "offline_claim_support": true,
+    "offline_citation_validity": true
   },
   "passed": true
 }

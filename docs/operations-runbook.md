@@ -25,16 +25,23 @@ Admin có thể đọc snapshot tại `GET /api/v1/admin/metrics`. Theo dõi:
 - API count/latency theo route template và status class;
 - chat success/error, intent, tool, p50/p95/max;
 - RAG latency và no-evidence;
+- LLM response có usage, input/output token và chi phí USD ước tính theo model;
 - human escalation/ticket;
 - feedback positive rate.
 
 Snapshot reset khi process restart và không chứa PII. Production nghiêm túc cần
 ship structured logs/metrics sang hệ thống central với retention/access control.
+Hai biến `LLM_INPUT_COST_PER_MILLION_USD` và
+`LLM_OUTPUT_COST_PER_MILLION_USD` phải được cập nhật khi model, service tier hoặc
+bảng giá thay đổi; số tiền trong dashboard là ước tính, hóa đơn provider là nguồn
+đối soát cuối cùng. Ước tính hiện tính toàn bộ input ở mức uncached, nên có thể
+cao hơn hóa đơn khi prompt caching được áp dụng.
 
 ## Deploy checklist
 
 - [ ] Commit/tag mục tiêu đã review; CI xanh.
-- [ ] Eval report pass và dataset không giảm.
+- [ ] Offline eval pass, dataset không giảm và provider-generated faithfulness
+      report của đúng model/prompt đạt ≥ 0,90 với citation validity 1,00.
 - [ ] Migration `alembic check` sạch; downgrade đã test nếu migration cho phép.
 - [ ] Database + upload backup mới.
 - [ ] Không có secret trong diff/build log.
@@ -48,7 +55,9 @@ ship structured logs/metrics sang hệ thống central với retention/access co
 Triệu chứng: `REQUEST_TIMEOUT`, provider error, chat error tăng.
 
 1. Kiểm tra provider status và outbound network.
-2. Không tăng retry vô hạn; giữ request/tool timeout.
+2. Kiểm tra circuit state qua error rate. Mặc định mỗi call có tối đa 3 attempt,
+   circuit mở sau 3 call thất bại liên tiếp và thử phục hồi sau 30 giây; không
+   tăng retry vô hạn, vẫn giữ request/tool timeout.
 3. Xác nhận order/product endpoint không bị expose riêng cho browser.
 4. Thông báo dịch vụ AI tạm gián đoạn; không đoán câu trả lời.
 5. Với case cần hỗ trợ, đưa human handoff; ticket chỉ tạo khi khách xác nhận.
@@ -95,7 +104,7 @@ Triệu chứng: `REQUEST_TIMEOUT`, provider error, chat error tăng.
 1. Lưu case đã redacted vào `security_eval.jsonl`.
 2. Xác nhận tool trace và ownership; nếu có data exposure, theo data incident.
 3. Sửa boundary/backend guard trước, prompt chỉ là defense bổ sung.
-4. Rerun toàn bộ 509+ cases; gate critical bypass phải bằng 0.
+4. Rerun toàn bộ 533+ cases; gate critical bypass phải bằng 0.
 5. Deploy theo checklist và theo dõi intent/tool distribution.
 
 ## Retention

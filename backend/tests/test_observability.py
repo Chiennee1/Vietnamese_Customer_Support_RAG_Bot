@@ -34,6 +34,12 @@ def test_metrics_snapshot_reports_percentiles_and_business_rates() -> None:
         retrieved_count=0,
         latency_ms=25,
     )
+    metrics.record_llm_usage(
+        model="gpt-5-mini",
+        input_tokens=1_000,
+        output_tokens=500,
+        estimated_cost_usd=0.00125,
+    )
 
     snapshot = metrics.snapshot()
     api = snapshot["api"]
@@ -47,6 +53,13 @@ def test_metrics_snapshot_reports_percentiles_and_business_rates() -> None:
     assert chat["tools"]["get_order_status"] == 1
     assert feedback["positive_rate"] == 0.5
     assert snapshot["rag"]["no_result"] == 1
+    assert snapshot["llm"] == {
+        "responses_with_usage": 1,
+        "models": {"gpt-5-mini": 1},
+        "input_tokens": 1_000,
+        "output_tokens": 500,
+        "estimated_cost_usd": 0.00125,
+    }
 
 
 def test_empty_latency_summary_is_stable() -> None:

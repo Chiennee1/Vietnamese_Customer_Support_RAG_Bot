@@ -79,7 +79,7 @@ jobs:
       - name: Run unit and PostgreSQL integration tests
         run: uv run --no-sync pytest
 
-      - name: Enforce deterministic RAG, agent, and security gates
+      - name: Enforce RAG, agent, security, and citation gates
         run: uv run --no-sync support-eval --output ../evals/ci_report.json
 
   frontend:

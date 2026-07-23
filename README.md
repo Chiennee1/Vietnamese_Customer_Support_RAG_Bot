@@ -12,8 +12,12 @@ hoặc chính sách riêng của cửa hàng.
   quản trị knowledge base/hàng đợi vận hành.
 - 500 khách hàng synthetic, 100 sản phẩm, 300 SKU, 1.000 đơn hàng, 600 bảo hành
   và 200 ticket.
-- 509 gold cases; toàn bộ deterministic release gate hiện đạt.
+- 533 gold cases; toàn bộ deterministic release gate hiện đạt.
 - Docker Compose local và cấu hình Railway cho monorepo đã sẵn sàng.
+
+Provider-generated faithfulness gate đã có command/workflow nhưng chưa chạy vì
+workspace không có `OPENAI_API_KEY`; đây là blocker trước production, không được
+suy ra từ điểm offline.
 
 ```mermaid
 flowchart LR
@@ -100,16 +104,17 @@ $env:PYTHONPATH = 'backend'
 backend\.venv\Scripts\python.exe -m app.evaluation.runner
 ```
 
-Baseline ngày 2026-07-23:
+Baseline ngày 2026-07-24:
 
 | Gate | Kết quả |
 |---|---:|
-| Dataset | 509 cases |
+| Dataset | 533 cases |
 | Offline lexical RAG HitRate@5 / Recall@5 | 0,976 / 0,976 |
 | Offline lexical RAG MRR | 0,889 |
 | Agent intent / tool accuracy | 1,000 / 1,000 |
 | Security critical bypass | 0 |
-| Local HTTP smoke, 20 request / concurrency 4 | 100% success, p95 136 ms |
+| Offline supported claim / citation validity | 1,000 / 1,000 |
+| Local HTTP smoke, 20 request / concurrency 4 | 100% success, p95 133 ms |
 
 Load smoke chỉ dùng lời chào deterministic, không đại diện latency hoặc chi phí
 của request có LLM/embedding. Xem phương pháp và giới hạn trong

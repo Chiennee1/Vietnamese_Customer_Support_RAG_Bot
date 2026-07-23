@@ -41,6 +41,12 @@ class Settings(BaseSettings):
     llm_provider: Literal["openai"] = "openai"
     llm_model: str = "gpt-5-mini"
     llm_max_output_tokens: int = Field(default=700, ge=100, le=10_000)
+    llm_input_cost_per_million_usd: float = Field(default=0.25, ge=0)
+    llm_output_cost_per_million_usd: float = Field(default=2.0, ge=0)
+    provider_max_attempts: int = Field(default=3, ge=1, le=5)
+    provider_retry_base_seconds: float = Field(default=0.2, ge=0, le=5)
+    provider_circuit_failure_threshold: int = Field(default=3, ge=1, le=20)
+    provider_circuit_recovery_seconds: float = Field(default=30, ge=0, le=600)
     max_tool_calls: int = Field(default=8, ge=1, le=20)
     tool_timeout_seconds: int = Field(default=8, ge=1, le=60)
     embedding_provider: Literal["openai"] = "openai"

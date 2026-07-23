@@ -27,6 +27,7 @@ dependencies = [
 
 [project.scripts]
 support-eval = "app.evaluation.runner:main"
+support-provider-faithfulness = "app.evaluation.provider_faithfulness:main"
 
 [dependency-groups]
 dev = [

@@ -31,7 +31,10 @@ FILLERS = [
 
 def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
     path.write_text(
-        "".join(json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n" for row in rows),
+        "".join(
+            json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n"
+            for row in rows
+        ),
         encoding="utf-8",
     )
 
@@ -518,12 +521,142 @@ def rag_cases() -> list[dict[str, Any]]:
     return rows
 
 
+def faithfulness_cases() -> list[dict[str, Any]]:
+    sources = [
+        (
+            "Chính sách đổi trả Điểm Chạm",
+            "Thời gian gửi yêu cầu",
+            "Khách hàng có thể gửi yêu cầu đổi trả trong vòng 7 ngày theo lịch kể từ thời điểm đơn hàng được ghi nhận đã giao.",
+            "Tôi có bao nhiêu ngày để gửi yêu cầu đổi trả?",
+            "Khách hàng có thể gửi yêu cầu đổi trả trong vòng 7 ngày theo lịch kể từ khi đơn được ghi nhận đã giao [KB-1].",
+            "Khách hàng có thể gửi yêu cầu đổi trả trong vòng 30 ngày theo lịch kể từ khi đơn được ghi nhận đã giao [KB-1].",
+        ),
+        (
+            "Chính sách đổi trả Điểm Chạm",
+            "Hoàn tiền và thay thế",
+            "Trợ lý không tự hứa hoàn tiền, đổi máy hoặc mức bồi thường.",
+            "Trợ lý có thể hứa hoàn tiền hoặc đổi máy ngay không?",
+            "Trợ lý không tự hứa hoàn tiền, đổi máy hoặc mức bồi thường [KB-1].",
+            "Trợ lý tự hứa hoàn tiền, đổi máy hoặc mức bồi thường [KB-1].",
+        ),
+        (
+            "Chính sách giao nhận Điểm Chạm",
+            "Khu vực và thời gian dự kiến",
+            "Đơn nội thành Thành phố Hồ Chí Minh và Hà Nội thường được giao trong 1–2 ngày làm việc.",
+            "Đơn nội thành Thành phố Hồ Chí Minh và Hà Nội thường giao trong bao lâu?",
+            "Đơn nội thành Thành phố Hồ Chí Minh và Hà Nội thường được giao trong 1–2 ngày làm việc [KB-1].",
+            "Đơn nội thành Thành phố Hồ Chí Minh và Hà Nội thường được giao trong 7 ngày làm việc [KB-1].",
+        ),
+        (
+            "Chính sách giao nhận Điểm Chạm",
+            "Khu vực và thời gian dự kiến",
+            "Các tỉnh thành khác thường cần 2–5 ngày làm việc.",
+            "Đơn giao đến tỉnh thành khác thường cần bao lâu?",
+            "Các tỉnh thành khác thường cần 2–5 ngày làm việc [KB-1].",
+            "Các tỉnh thành khác thường cần 10 ngày làm việc [KB-1].",
+        ),
+        (
+            "Chính sách giao nhận Điểm Chạm",
+            "Theo dõi đơn hàng",
+            "Khách hàng cần đăng nhập và cung cấp mã đơn thuộc tài khoản của mình.",
+            "Tôi cần điều kiện gì để theo dõi đơn hàng?",
+            "Khách hàng cần đăng nhập và cung cấp mã đơn thuộc tài khoản của mình [KB-1].",
+            "Khách hàng không cần đăng nhập và có thể cung cấp mã đơn của người khác [KB-1].",
+        ),
+        (
+            "Chính sách giao nhận Điểm Chạm",
+            "Chậm giao hoặc thất lạc",
+            "Trợ lý có thể tạo ticket sau khi khách hàng xác nhận nhưng không được tự tuyên bố đơn thất lạc hoặc hứa bồi thường.",
+            "Nếu đơn chậm giao, trợ lý có thể tuyên bố thất lạc và hứa bồi thường không?",
+            "Trợ lý có thể tạo ticket sau khi khách hàng xác nhận nhưng không được tự tuyên bố đơn thất lạc hoặc hứa bồi thường [KB-1].",
+            "Trợ lý có thể tự tuyên bố đơn thất lạc và hứa bồi thường [KB-1].",
+        ),
+        (
+            "Chính sách thanh toán Điểm Chạm",
+            "Phương thức thanh toán",
+            "Hệ thống demo mô tả ba nhóm phương thức: thanh toán khi nhận hàng, chuyển khoản và thanh toán bằng thẻ qua cổng thanh toán.",
+            "Hệ thống demo hỗ trợ những phương thức thanh toán nào?",
+            "Hệ thống demo hỗ trợ thanh toán khi nhận hàng [KB-1].",
+            "Hệ thống demo có hai nhóm phương thức: tiền mặt tại cửa hàng và ví điện tử [KB-1].",
+        ),
+        (
+            "Chính sách thanh toán Điểm Chạm",
+            "Bảo vệ thông tin",
+            "Khách hàng không được gửi mật khẩu, OTP, mã PIN hoặc toàn bộ số thẻ trong hội thoại.",
+            "Tôi có nên gửi mật khẩu hoặc OTP trong hội thoại không?",
+            "Khách hàng không được gửi mật khẩu trong hội thoại [KB-1].",
+            "Khách hàng được gửi mật khẩu, OTP, mã PIN và toàn bộ số thẻ trong hội thoại [KB-1].",
+        ),
+        (
+            "Chính sách bảo hành Điểm Chạm",
+            "Điều kiện tiếp nhận",
+            "Việc tiếp nhận không đồng nghĩa với phê duyệt bảo hành; kết luận cuối cùng cần kết quả kiểm tra kỹ thuật.",
+            "Tiếp nhận thiết bị có đồng nghĩa đã phê duyệt bảo hành không?",
+            "Việc tiếp nhận không đồng nghĩa với phê duyệt bảo hành; kết luận cuối cùng cần kết quả kiểm tra kỹ thuật [KB-1].",
+            "Việc tiếp nhận đồng nghĩa với phê duyệt bảo hành ngay [KB-1].",
+        ),
+        (
+            "Chính sách bảo hành Điểm Chạm",
+            "An toàn pin",
+            "Nếu thiết bị nóng bất thường, phồng pin, bốc khói hoặc có mùi khét, khách hàng nên ngừng sử dụng, không sạc.",
+            "Tôi nên làm gì nếu thiết bị phồng pin hoặc bốc khói?",
+            "Khách hàng nên ngừng sử dụng nếu thiết bị phồng pin [KB-1].",
+            "Nếu thiết bị phồng pin hoặc bốc khói, khách hàng nên tiếp tục sử dụng và sạc [KB-1].",
+        ),
+        (
+            "Thông báo quyền riêng tư Điểm Chạm",
+            "Giới hạn truy cập",
+            "Khách hàng chỉ được tra cứu đơn hàng, bảo hành, ticket và hội thoại thuộc tài khoản của mình.",
+            "Tôi được tra cứu dữ liệu thuộc tài khoản nào?",
+            "Khách hàng chỉ được tra cứu đơn hàng, bảo hành, ticket và hội thoại thuộc tài khoản của mình [KB-1].",
+            "Khách hàng được tra cứu dữ liệu thuộc 10 tài khoản [KB-1].",
+        ),
+        (
+            "Thông báo quyền riêng tư Điểm Chạm",
+            "Nhật ký và thời gian lưu",
+            "Dữ liệu hội thoại demo được lưu tối đa 30 ngày.",
+            "Dữ liệu hội thoại demo được lưu tối đa bao lâu?",
+            "Dữ liệu hội thoại demo được lưu tối đa 30 ngày [KB-1].",
+            "Dữ liệu hội thoại demo được lưu tối đa 365 ngày [KB-1].",
+        ),
+    ]
+    rows: list[dict[str, Any]] = []
+    for index, (title, section, excerpt, question, supported, unsupported) in enumerate(
+        sources,
+        start=1,
+    ):
+        common = {
+            "title": title,
+            "section": section,
+            "excerpt": excerpt,
+            "question": question,
+        }
+        rows.append(
+            {
+                "id": f"faithfulness-{index:03d}-supported",
+                "answer": supported,
+                "expected_valid": True,
+                **common,
+            }
+        )
+        rows.append(
+            {
+                "id": f"faithfulness-{index:03d}-unsupported",
+                "answer": unsupported,
+                "expected_valid": False,
+                **common,
+            }
+        )
+    return rows
+
+
 def main() -> None:
     EVAL_DIR.mkdir(parents=True, exist_ok=True)
     datasets = {
         "agent_eval.jsonl": agent_cases(),
         "security_eval.jsonl": security_cases(),
         "rag_eval.jsonl": rag_cases(),
+        "faithfulness_eval.jsonl": faithfulness_cases(),
     }
     for filename, rows in datasets.items():
         write_jsonl(EVAL_DIR / filename, rows)
